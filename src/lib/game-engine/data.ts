@@ -79,6 +79,56 @@ export const CITIES: City[] = [
     bonus: { budget: 30 },
     malus: { opinion: -15, securite: -15, infrastructure: -10 },
   },
+  // ★ Nouvelles villes
+  {
+    id: 'belle-rive',
+    name: 'Belle-Rive',
+    size: 'ville-moyenne',
+    difficulty: 'facile',
+    population: 28_000,
+    description: 'Une ville au bord du fleuve, fière de son patrimoine fluvial mais menacée par la montée des eaux. Les vieux quartiers ont du cachet mais les infrastructures vieillissent.',
+    bonus: { opinion: 5 },
+    malus: { infrastructure: -5 },
+  },
+  {
+    id: 'hauterive',
+    name: 'Clairval',
+    size: 'petit-village',
+    difficulty: 'facile',
+    population: 1_800,
+    description: 'Perché sur une colline, ce village offre une vue imprenable sur la vallée. Les habitants s\'accrochent à leurs traditions mais la jeunesse s\'en va.',
+    bonus: { opinion: 15, education: 5 },
+    malus: { budget: -15 },
+  },
+  {
+    id: 'pierres-blanches',
+    name: 'Pierres-Blanches',
+    size: 'ville-moyenne',
+    difficulty: 'moyen',
+    population: 42_000,
+    description: 'Cité médiévale aux ruelles pavées, classée zone historique. Le tourisme fait vivre la ville mais les règles de protection des bâtiments compliquent tous les travaux.',
+    bonus: { opinion: 10, infrastructure: 5 },
+    malus: { budget: -10, education: -5 },
+  },
+  {
+    id: 'saint-eloi',
+    name: 'Saint-Éloi',
+    size: 'grande-ville',
+    difficulty: 'difficile',
+    population: 200_000,
+    description: 'Berceau de l\'industrie textile du pays, Saint-Éloi panse encore les plaies de la désindustrialisation. Les friches industrielles sont partout, mais l\'esprit ouvrier reste vivace.',
+    malus: { budget: -10, opinion: -5, education: -10 },
+  },
+  {
+    id: 'havre-lumiere',
+    name: 'Havre-Lumière',
+    size: 'grande-ville',
+    difficulty: 'difficile',
+    population: 190_000,
+    description: 'Ville portuaire cosmopolite, carrefour des cultures et du commerce. L\'air du large porte les promesses d\'un avenir radieux, mais les inégalités sociales y sont criantes.',
+    bonus: { budget: 15, opinion: 5 },
+    malus: { securite: -10, education: -5 },
+  },
 ]
 
 /** Événements aléatoires */
@@ -141,6 +191,117 @@ export const EVENTS: GameEvent[] = [
       { label: 'Moderniser les routes et transports', effects: { budget: 15, infrastructure: 20, opinion: 5 }, description: 'Les infrastructures s\'améliorent.' },
       { label: 'Investir dans les écoles', effects: { budget: 15, education: 20, opinion: 10 }, description: 'L\'éducation reçoit un boost.' },
       { label: 'Créer un centre culturel', effects: { budget: 15, opinion: 15, education: 5 }, description: 'La culture locale s\'épanouit.' },
+    ],
+  },
+  // ★ Nouveaux événements narratifs
+  {
+    id: 'scandale-urbanisme',
+    title: 'Scandale d\'urbanisme',
+    description: 'Un promoteur immobilier proche de la mairie a obtenu un permis de construire litigieux. L\'opposition crie au favoritisme. Les articles commencent à pleuvoir dans la presse locale.',
+    choices: [
+      { label: 'Annuler le permis et lancer une enquête', effects: { budget: -10, opinion: 20, securite: 5 }, description: 'Vous montrez votre intégrité. L\'enquête calme le jeu, même si vous perdez un allié influent.' },
+      { label: 'Défendre le projet et ses emplois', effects: { budget: 10, opinion: -15, infrastructure: 10 }, description: 'Le projet crée des emplois mais votre réputation en prend un coup. Les détracteurs vous accusent de complicité.' },
+      { label: 'Rencontrer le promoteur en secret', effects: { budget: 15, opinion: -10, securite: -5 }, description: 'Un arrangement est trouvé dans l\'ombre. Personne ne saura jamais ce qui s\'est dit, mais vous vous sentez sale.' },
+    ],
+  },
+  {
+    id: 'epidemie-grippe',
+    title: 'Épidémie saisonnière',
+    description: 'Une grippe particulièrement virulente frappe la ville. Les écoles et les maisons de retraite sont touchées. Les hôpitaux saturés appellent à l\'aide. Chaque heure compte.',
+    choices: [
+      { label: 'Lancer une campagne de vaccination massive', effects: { budget: -20, opinion: 15, education: 5, securite: 10 }, description: 'Les files d\'attente s\'allongent mais les vies sont sauvées. Les médecins vous saluent.' },
+      { label: 'Confiner temporairement les écoles', effects: { budget: -5, opinion: 5, education: -10, securite: 5 }, description: 'Mesure impopulaire chez les parents mais la propagation ralentit.' },
+      { label: 'Minimiser la gravité et communiquer', effects: { budget: 5, opinion: -20, securite: -5 }, description: 'Vous rassurez la population mais les cas graves s\'accumulent. La presse vous étrille.' },
+    ],
+  },
+  {
+    id: 'marche-nocturne',
+    title: 'Le marché nocturne',
+    description: 'Des habitants proposent d\'organiser un marché de nuit hebdomadaire dans le centre-ville. Les commerçants sont divisés : les uns y voient une aubaine, les autres craignent le bruit et l\'insécurité.',
+    choices: [
+      { label: 'Autoriser et financer le marché', effects: { budget: -5, opinion: 15, securite: -5 }, description: 'Le marché est un succès populaire. Les ruelles s\'animent, mais quelques plaintes pour tapage arrivent.' },
+      { label: 'Proposer une version encadrée', effects: { budget: -3, opinion: 8, securite: 5 }, description: 'Compromis raisonnable : le marché a lieu mais avec des règles strictes. Tout le monde grogne un peu.' },
+      { label: 'Refuser, risque trop élevé', effects: { budget: 5, opinion: -10, securite: 5 }, description: 'Vous misez sur la tranquillité. Les commerçants innovants vous en veulent.' },
+    ],
+  },
+  {
+    id: 'fermeture-usine',
+    title: 'Fermeture annoncée',
+    description: 'L\'usine historique du bassin d\'emploi annonce sa fermeture dans six mois. Cinq cents employés vont perdre leur travail. La ville, déjà fragile, risque le coup de grâce.',
+    choices: [
+      { label: 'Négocier un plan social avec reclassement', effects: { budget: -20, opinion: 15, education: 10, securite: 5 }, description: 'Vous obtenez des formations et des reclassements. Certains retrouveront un emploi, mais tous ne seront pas sauvés.' },
+      { label: 'Proposer des exonérations fiscales', effects: { budget: -15, opinion: 5, infrastructure: 10 }, description: 'Vous tentez de faire revenir l\'usine sur sa décision. La direction accepte de reporter, pas d\'annuler.' },
+      { label: 'Laisser faire le marché', effects: { budget: 10, opinion: -25, securite: -10 }, description: 'Pas un centime public. La ville se vide, les commerces ferment. Votre popularité s\'effondre.' },
+    ],
+  },
+  {
+    id: 'tempete-verglas',
+    title: 'Tempête de verglas',
+    description: 'Une tempête de glace historique s\'abat sur la région. Les lignes électriques cèdent, les routes sont impraticables, les personnes âgées sont coincées chez elles sans chauffage.',
+    choices: [
+      { label: 'Ouvrir des centres d\'urgence chauffés', effects: { budget: -15, opinion: 20, infrastructure: 5 }, description: 'Les gymnases se transforment en refuges. La solidarité s\'organise, les habitants vous remercient.' },
+      { label: 'Déployer la voirie en priorité', effects: { budget: -10, opinion: 10, infrastructure: 15 }, description: 'Les routes sont dégagées en 48h. L\'approvisionnement reprend mais certains ont souffert du froid.' },
+      { label: 'Attendre que ça passe', effects: { budget: 5, opinion: -15, infrastructure: -10 }, description: 'Vous économisez le budget. Mais trois jours sans électricité, c\'est long. La ville se souvient.' },
+    ],
+  },
+  {
+    id: 'conflit-associations',
+    title: 'Guerre des associations',
+    description: 'Deux associations locales rivales se déchirent pour l\'attribution de la salle des fêtes municipale. L\'une organise la fête du terroir, l\'autre un concert solidaire. Les passions s\'enflamment en conseil municipal.',
+    choices: [
+      { label: 'Atteindre une médiation équitable', effects: { budget: -5, opinion: 15, education: 5 }, description: 'Vous jouez les arbitres. Les deux associations finissent par coorganiser un événement commun, qui cartonne.' },
+      { label: 'Trancher en faveur du concert', effects: { budget: 0, opinion: 5, education: 10 }, description: 'La jeunesse vous applaudit mais les traditionalistes bougonnent. Une scission s\'amorce.' },
+      { label: 'Ne pas s\'en mêler', effects: { budget: 5, opinion: -10, securite: -5 }, description: 'Les deux camps vous reprochent votre passivité. La salle reste fermée et tout le monde est perdant.' },
+    ],
+  },
+  {
+    id: 'nouveau-logement',
+    title: 'Crise du logement',
+    description: 'Les prix de l\'immobilier explosent. Les jeunes familles quittent la ville, faute de pouvoir se loger. Un promoteur propose un gigantesque programme immobilier sur une friche.',
+    choices: [
+      { label: 'Approuver le programme de logements sociaux', effects: { budget: -20, opinion: 15, infrastructure: 10, education: 5 }, description: 'Les HLM sortent de terre. Les nouveaux arrivants repeuplent l\'école, mais les anciens râlent sur le changement.' },
+      { label: 'Négocier un mix social et privé', effects: { budget: -5, opinion: 10, infrastructure: 5 }, description: 'Compromis intelligent : moitié logements sociaux, moitié accession. Personne n\'est ravi, mais personne ne manifeste.' },
+      { label: 'Ne pas toucher au PLU', effects: { budget: 10, opinion: -15, infrastructure: -5 }, description: 'Vous protégez le cadre de vie. Mais la ville se gentrifie et les jeunes s\'en vont.' },
+    ],
+  },
+  {
+    id: 'pole-energie',
+    title: 'Projet de parc éolien',
+    description: 'Un énergéticien propose d\'installer six éoliennes sur la colline voisine. Énergie verte et recettes fiscales contre nuisance visuelle et patrimoine paysager. Les débats enflamment le café du village.',
+    choices: [
+      { label: 'Soutenir le projet écologique', effects: { budget: 15, opinion: 5, infrastructure: 10 }, description: 'Les éoliennes tournent. Les comptes de la ville respirent, mais les puristes du paysage ne vous le pardonneront pas.' },
+      { label: 'Organiser un référendum local', effects: { budget: -5, opinion: 15, securite: 5 }, description: 'Vous laissez les citoyens décider. La démocratie locale sort renforcée, mais le projet prend du retard.' },
+      { label: 'Bloquer le projet', effects: { budget: 5, opinion: -10, infrastructure: -5 }, description: 'Le paysage est préservé. Mais votre refus de l\'innovation vous colle à la peau.' },
+    ],
+  },
+  {
+    id: 'tensions-banlieue',
+    title: 'Tensions en périphérie',
+    description: 'Une nuit de violences urbaines éclate dans un quartier sensible. Des voitures brûlent, des commerces sont vandalisés. La situation est tendue, et les habitants du centre-ville ont peur.',
+    choices: [
+      { label: 'Dialoguer avec les jeunes du quartier', effects: { budget: -10, opinion: 10, education: 15, securite: 5 }, description: 'Vous tendez la main. Les échanges sont durs mais sincères. Un vrai travail de fond commence.' },
+      { label: 'Renforcer la présence policière', effects: { budget: -15, opinion: 5, securite: 20 }, description: 'Les CRS patrouillent, le calme revient. Mais la défiance entre la police et la jeunesse s\'aggrave.' },
+      { label: 'Condamner fermement les violences', effects: { budget: 5, opinion: -15, education: -5, securite: -10 }, description: 'Vos déclarations martiales plaisent au centre-ville, mais vous perdez tout crédit dans les quartiers.' },
+    ],
+  },
+  {
+    id: 'annee-culturelle',
+    title: 'Année culturelle',
+    description: 'Un mécène local, ancien enfant du pays devenu célèbre, propose de financer une saison culturelle d\'exception. Concerts, expositions et spectacles pendant six mois. Un souffle inespéré.',
+    choices: [
+      { label: 'Saisir l\'opportunité avec enthousiasme', effects: { budget: 10, opinion: 20, education: 15 }, description: 'La saison est un triomphe. La ville rayonne dans tout le pays. On parle de vous comme d\'un visionnaire.' },
+      { label: 'Accepter avec un programme modeste', effects: { budget: 5, opinion: 8, education: 5 }, description: 'Quelques beaux événements animent l\'automne. Sympa mais pas inoubliable.' },
+      { label: 'Refuser, priorité aux services publics', effects: { budget: 10, opinion: -10, securite: 5 }, description: 'La culture attendra. Votre prudence est respectée mais le mécène offensé ne reviendra pas.' },
+    ],
+  },
+  {
+    id: 'secheresse',
+    title: 'Sécheresse historique',
+    description: 'Trois mois sans une goutte de pluie. Les nappes phréatiques sont au plus bas. Les agriculteurs sont désespérés, les fontaines sont à sec, et des restrictions d\'eau sont inévitables.',
+    choices: [
+      { label: 'Instaurer des restrictions strictes et équitables', effects: { budget: -5, opinion: 10, infrastructure: 5 }, description: 'Les restrictions passent mieux grâce à votre communication transparente. L\'eau est rationnée mais pas injustement.' },
+      { label: 'Investir dans des citernes et camions-citernes', effects: { budget: -20, opinion: 5, infrastructure: 15 }, description: 'L\'eau potable est acheminée. Solution coûteuse mais efficace. Les agriculteurs vous doivent une fière chandelle.' },
+      { label: 'Laisser faire et espérer la pluie', effects: { budget: 10, opinion: -20, infrastructure: -10 }, description: 'Un agriculteur perd son troupeau. Les habitants vous pardonnent mal votre inaction.' },
     ],
   },
 ]

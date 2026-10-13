@@ -53,8 +53,8 @@ describe('★ Stats', () => {
 })
 
 describe('★ Villes', () => {
-  it('CITIES contient au moins 5 villes de tailles différentes', () => {
-    expect(CITIES.length).toBeGreaterThanOrEqual(5)
+  it('CITIES contient au moins 12 villes de tailles différentes', () => {
+    expect(CITIES.length).toBeGreaterThanOrEqual(12)
     const sizes = new Set(CITIES.map(c => c.size))
     expect(sizes.has('petit-village')).toBe(true)
     expect(sizes.has('metropole')).toBe(true)
@@ -78,8 +78,8 @@ describe('★ Villes', () => {
 })
 
 describe('★ Événements', () => {
-  it('EVENTS contient des événements avec des choix', () => {
-    expect(EVENTS.length).toBeGreaterThanOrEqual(4)
+  it('EVENTS contient au moins 15 événements avec des choix', () => {
+    expect(EVENTS.length).toBeGreaterThanOrEqual(15)
     for (const event of EVENTS) {
       expect(event.choices.length).toBeGreaterThanOrEqual(2)
       for (const choice of event.choices) {
