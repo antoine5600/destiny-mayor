@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import type { Origin, GameContext, CareerResult } from '@/types/game'
+import type { Origin, GameContext, CareerResult, Stats } from '@/types/game'
 
 const ORIGINS: { id: Origin; label: string; emoji: string; desc: string }[] = [
   { id: 'rural', label: 'Rural', emoji: '🏡', desc: 'Proche des habitants, budget serré' },
@@ -204,7 +204,18 @@ export default function Home() {
                 className="w-full p-4 rounded-lg border-2 border-slate-600 bg-slate-800 hover:border-yellow-400 text-left transition-all disabled:opacity-50"
               >
                 <p className="font-semibold">{choice.label}</p>
-                <p className="text-sm text-slate-400 mt-1">{choice.description}</p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {effectToTags(choice.effects).map((tag, j) => (
+                    <span key={j} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                      tag.direction === 'up' ? 'bg-green-900/50 text-green-400' :
+                      tag.direction === 'down' ? 'bg-red-900/50 text-red-400' :
+                      'bg-slate-700 text-slate-400'
+                    }`}>
+                      {tag.icon}{tag.label}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-slate-400 mt-2">{choice.description}</p>
               </button>
             ))}
           </div>
@@ -387,4 +398,18 @@ function statEmoji(key: string): string {
 function statLabel(key: string): string {
   const map: Record<string, string> = { budget: 'Budget', opinion: 'Opinion', infrastructure: 'Infra', education: 'Éduc', securite: 'Sécu' }
   return map[key] || key
+}
+
+function effectToTags(effects: Partial<Stats>): { icon: string; label: string; direction: 'up' | 'down' | 'none' }[] {
+  const icons: Record<string, string> = { budget: '💰', opinion: '📊', infrastructure: '🏗️', education: '📚', securite: '🛡️' }
+  const labels: Record<string, string> = { budget: 'Budget', opinion: 'Opinion', infrastructure: 'Infra', education: 'Éduc', securite: 'Sécu' }
+  const result: { icon: string; label: string; direction: 'up' | 'down' | 'none' }[] = []
+  for (const [key, value] of Object.entries(effects)) {
+    if (value === 0 || value === undefined) continue
+    const icon = icons[key] || '📌'
+    const label = `${labels[key] || key} ${value > 0 ? '+' : ''}${value}`
+    const direction = value > 0 ? 'up' : 'down'
+    result.push({ icon, label, direction })
+  }
+  return result
 }
