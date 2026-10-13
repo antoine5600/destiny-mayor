@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import type { Origin, GameContext, CareerResult } from '@/types/game'
 
 const ORIGINS: { id: Origin; label: string; emoji: string; desc: string }[] = [
@@ -20,6 +21,7 @@ type ActionType =
   | { type: 'get-accessible-cities' }
 
 export default function Home() {
+  const { data: session } = useSession()
   const [name, setName] = useState('')
   const [selectedOrigin, setSelectedOrigin] = useState<Origin | null>(null)
   const [gameCtx, setGameCtx] = useState<GameContext | null>(null)
@@ -28,6 +30,7 @@ export default function Home() {
   const [eventResult, setEventResult] = useState<string | null>(null)
   const [careerResult, setCareerResult] = useState<CareerResult | null>(null)
   const [accessibleCities, setAccessibleCities] = useState<{ id: string; name: string; size: string }[]>([])
+  const [saveMsg, setSaveMsg] = useState('')
 
   const apiCall = useCallback(async (action: ActionType) => {
     if (!gameCtx) return
@@ -79,11 +82,60 @@ export default function Home() {
     }
   }
 
+  async function saveGame() {
+    if (!session?.user?.id) { signIn('google'); return }
+    setSaveMsg('')
+    try {
+      const res = await fetch('/api/game/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context: gameCtx }),
+      })
+      const data = await res.json()
+      setSaveMsg(data.success ? '💾 Sauvegardé !' : data.error || 'Erreur')
+    } catch { setSaveMsg('Erreur de sauvegarde.') }
+    setTimeout(() => setSaveMsg(''), 3000)
+  }
+
+  async function loadGame() {
+    if (!session?.user?.id) { signIn('google'); return }
+    try {
+      const res = await fetch('/api/game/save')
+      const data = await res.json()
+      if (data.success && data.data) {
+        const { career, stats, mayorName, origin, year, currentCity, phase, yearInMandate } = data.data
+        const ctx: GameContext = {
+          mayor: { name: mayorName, origin, birthYear: 2026, stats, career, currentCityId: currentCity, year, isRetired: false },
+          currentCity: currentCity ? { id: currentCity, name: currentCity, size: 'petit-village', difficulty: 'facile', population: 0, description: '' } : null,
+          currentEvent: null,
+          phase,
+          yearInMandate,
+          mandateLength: 6,
+        }
+        setGameCtx(ctx)
+      } else { setError('Aucune sauvegarde trouvée.') }
+    } catch { setError('Erreur de chargement.') }
+  }
+
   // ===== Écran de création =====
   if (!gameCtx) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center justify-center p-4">
         <div className="max-w-lg w-full space-y-8">
+          {/* Auth header */}
+          <div className="flex justify-end gap-2">
+            {session?.user ? (
+              <div className="flex items-center gap-2">
+                {session.user.image && <img src={session.user.image} className="w-7 h-7 rounded-full" alt="" />}
+                <span className="text-xs text-slate-400">{session.user.name}</span>
+                <button onClick={() => signOut()} className="text-xs text-red-400 hover:text-red-300">Déconnexion</button>
+              </div>
+            ) : (
+              <button onClick={() => signIn('google')} className="text-xs bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition-all">
+                Connexion Google 🚪
+              </button>
+            )}
+          </div>
           <div className="text-center space-y-2">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
               ★ Destiny Mayor ★
@@ -265,6 +317,19 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4">
       <div className="max-w-2xl mx-auto space-y-6">
+        {/* Auth bar */}
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            <button onClick={saveGame} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all">💾 Sauvegarder</button>
+            <button onClick={loadGame} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all">📂 Charger</button>
+          </div>
+          {session?.user ? (
+            <button onClick={() => signOut()} className="text-xs text-red-400 hover:text-red-300">Déconnexion</button>
+          ) : (
+            <button onClick={() => signIn('google')} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20">🚪 Connexion</button>
+          )}
+        </div>
+        {saveMsg && <p className="text-green-400 text-sm text-center">{saveMsg}</p>}
         <div className="text-center">
           <h1 className="text-2xl font-bold">★ Maire {gameCtx.mayor?.name} ★</h1>
           <p className="text-slate-400">
