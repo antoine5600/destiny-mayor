@@ -1,7 +1,8 @@
 // ===== API : Initialiser une nouvelle partie ★ =====
 import { NextRequest, NextResponse } from 'next/server'
 import { createInitialStats, CITIES } from '@/lib/game-engine/data'
-import type { Origin, Mayor, GameContext } from '@/types/game'
+import { startMandate } from '@/lib/game-engine/game-loop'
+import type { Origin, Mayor } from '@/types/game'
 
 const ORIGINS: Origin[] = ['rural', 'urbain', 'academique', 'entrepreneur']
 
@@ -36,17 +37,9 @@ export async function POST(request: NextRequest) {
       isRetired: false,
     }
 
-    // Première ville disponible selon l'origine
+    // Première ville disponible selon l'origine → démarre directement le mandat
     const firstCity = CITIES[0]
-
-    const context: GameContext = {
-      mayor,
-      currentCity: firstCity,
-      currentEvent: null,
-      phase: 'creation',
-      yearInMandate: 0,
-      mandateLength: 6,
-    }
+    const context = startMandate(mayor, firstCity)
 
     return NextResponse.json({ success: true, data: context })
   } catch (error) {
