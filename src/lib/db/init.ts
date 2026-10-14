@@ -1,7 +1,13 @@
 import { db } from './index'
+import { createClient } from '@libsql/client'
+import path from 'path'
 
-export function initDatabase() {
-  db.run(`
+const dbPath = path.join(process.cwd(), 'prisma', 'dev.db')
+
+async function main() {
+  const client = createClient({ url: `file:${dbPath}` })
+
+  await client.execute(`
     CREATE TABLE IF NOT EXISTS "user" (
       "id" TEXT PRIMARY KEY,
       "name" TEXT,
@@ -11,7 +17,7 @@ export function initDatabase() {
     )
   `)
 
-  db.run(`
+  await client.execute(`
     CREATE TABLE IF NOT EXISTS "account" (
       "id" TEXT PRIMARY KEY,
       "userId" TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -29,7 +35,7 @@ export function initDatabase() {
     )
   `)
 
-  db.run(`
+  await client.execute(`
     CREATE TABLE IF NOT EXISTS "session" (
       "id" TEXT PRIMARY KEY,
       "sessionToken" TEXT NOT NULL UNIQUE,
@@ -38,7 +44,7 @@ export function initDatabase() {
     )
   `)
 
-  db.run(`
+  await client.execute(`
     CREATE TABLE IF NOT EXISTS "verificationToken" (
       "identifier" TEXT NOT NULL,
       "token" TEXT NOT NULL,
@@ -46,7 +52,7 @@ export function initDatabase() {
     )
   `)
 
-  db.run(`
+  await client.execute(`
     CREATE TABLE IF NOT EXISTS "game_save" (
       "id" TEXT PRIMARY KEY,
       "userId" TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -64,6 +70,7 @@ export function initDatabase() {
   `)
 
   console.log('✓ Database initialized')
+  client.close()
 }
 
-initDatabase()
+main()
