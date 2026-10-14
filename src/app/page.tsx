@@ -51,6 +51,8 @@ export default function Home() {
           setCareerResult(data.data)
         } else if (action.type === 'get-accessible-cities') {
           setAccessibleCities(data.data)
+        } else if (data.data?.destituted) {
+          setCareerResult(data.data)
         } else {
           setGameCtx(data.data)
           if (data.eventResult) setEventResult(data.eventResult)
@@ -188,14 +190,31 @@ export default function Home() {
   // ===== Phase : Événement =====
   if (gameCtx.phase === 'evenement' && gameCtx.currentEvent) {
     const ev = gameCtx.currentEvent
+    const currentStats = gameCtx.mayor?.stats
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4">
+        <div className="max-w-lg mx-auto space-y-6">
           <div className="text-center">
             <span className="text-6xl">⚡</span>
             <h2 className="text-2xl font-bold mt-2">{ev.title}</h2>
             <p className="text-slate-400 mt-2">{ev.description}</p>
           </div>
+
+          {/* Stats actuelles */}
+          {currentStats && (
+            <div className="grid grid-cols-5 gap-1.5">
+              {Object.entries(currentStats).map(([key, value]) => (
+                <div key={key} className={`bg-slate-800 rounded-lg p-2 text-center ${value <= 0 ? 'ring-2 ring-red-500 animate-pulse' : ''}`}>
+                  <div className="text-lg">{statEmoji(key)}</div>
+                  <div className="w-full bg-slate-700 rounded-full h-1 mt-1">
+                    <div className={`h-1 rounded-full transition-all ${value <= 15 ? 'bg-red-500' : 'bg-gradient-to-r from-yellow-400 to-orange-500'}`} style={{ width: `${Math.max(0, value)}%` }} />
+                  </div>
+                  <div className="text-xs font-bold mt-1">{value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="space-y-3">
             {ev.choices.map((choice, i) => (
               <button
@@ -221,6 +240,31 @@ export default function Home() {
             ))}
           </div>
           {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+        </div>
+      </div>
+    )
+  }
+
+  // ===== Destitution =====
+  if (careerResult && careerResult.destituted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 flex items-center justify-center">
+        <div className="max-w-lg w-full space-y-6 text-center">
+          <span className="text-7xl">💀</span>
+          <h2 className="text-3xl font-bold text-red-500">Destitué !</h2>
+          <p className="text-xl text-slate-300">Maire {careerResult.mayor.name}</p>
+          <p className="text-slate-400">
+            Votre carrière politique s'achève brutalement. Les électeurs vous ont retiré leur confiance et les affaires courantes sont confiées à votre adjoint.
+          </p>
+          <div className="p-4 rounded-lg bg-red-900/20 border border-red-800">
+            <p className="text-sm text-red-400">Aucune ville ne veut plus de vous comme maire.</p>
+          </div>
+          <button
+            onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); }}
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold"
+          >
+            ★ Nouvelle partie ★
+          </button>
         </div>
       </div>
     )

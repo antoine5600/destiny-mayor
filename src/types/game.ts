@@ -75,6 +75,7 @@ export interface CareerResult {
   citiesGoverned: number
   finalScore: number
   grade: Grade
+  destituted?: boolean
 }
 
 export type Grade = 'S' | 'A' | 'B' | 'C' | 'D' | 'E'
@@ -84,7 +85,7 @@ export interface GameContext {
   mayor: Mayor | null
   currentCity: City | null
   currentEvent: GameEvent | null
-  phase: 'creation' | 'carriere' | 'evenement' | 'fin-mandat' | 'retraite'
+  phase: 'creation' | 'carriere' | 'evenement' | 'fin-mandat' | 'retraite' | 'destitution'
   yearInMandate: number
   mandateLength: number
 }

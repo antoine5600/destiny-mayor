@@ -67,15 +67,30 @@ export function resolveEventChoice(
   mayor: Mayor,
   event: GameEvent,
   choiceIndex: number
-): { mayor: Mayor; eventResult: string } {
+): { mayor: Mayor; eventResult: string; destituted: boolean } {
   const choice = event.choices[choiceIndex]
-  if (!choice) return { mayor, eventResult: 'Choix invalide.' }
+  if (!choice) return { mayor, eventResult: 'Choix invalide.', destituted: false }
 
   const newStats = applyEffects(mayor.stats, choice.effects)
   return {
     mayor: { ...mayor, stats: newStats },
     eventResult: choice.description,
+    destituted: checkDestitution(newStats),
   }
+}
+
+/** Vérifie si une stat est à 0 → destitution */
+export function checkDestitution(stats: Stats): boolean {
+  return Object.values(stats).some(v => v <= 0)
+}
+
+/** Renvoie le nom de la stat défaillante */
+export function getFailingStat(stats: Stats): string {
+  const labels: Record<string, string> = { budget: 'Budget', opinion: 'Opinion', infrastructure: 'Infrastructure', education: 'Éducation', securite: 'Sécurité' }
+  for (const [key, value] of Object.entries(stats)) {
+    if (value <= 0) return labels[key] || key
+  }
+  return ''
 }
 
 /** Avance d'un an dans le mandat */
@@ -95,6 +110,18 @@ export function advanceYear(context: GameContext): GameContext {
   if (eventHappens) {
     const usedIds = mayor.career.flatMap(e => e.eventsHappened)
     newEvent = drawRandomEvent(mayor.stats, usedIds)
+  }
+
+  // Vérifier destitution après la décroissance
+  if (checkDestitution(newStats)) {
+    return {
+      mayor: { ...mayor, stats: newStats, year: newYear },
+      currentCity,
+      currentEvent: null,
+      phase: 'destitution',
+      yearInMandate: nextYear,
+      mandateLength,
+    }
   }
 
   return {

@@ -53,6 +53,16 @@ export async function POST(request: NextRequest) {
         }
         const result = resolveEventChoice(context.mayor as Mayor, context.currentEvent, action.choiceIndex)
 
+        // Destitution immédiate si une stat tombe à 0
+        if (result.destituted) {
+          const city = context.currentCity
+          const careerResult = retire({
+            ...result.mayor,
+            career: city ? [...result.mayor.career, { cityId: city.id, startYear: result.mayor.year - context.yearInMandate, endYear: result.mayor.year, eventsHappened: [], finalStats: { ...result.mayor.stats }, satisfaction: 0 }] : result.mayor.career,
+          })
+          return NextResponse.json({ success: true, data: { ...careerResult, destituted: true } })
+        }
+
         // Vérifier si c'était la dernière année
         if (context.yearInMandate >= context.mandateLength) {
           const ended = endMandate({ ...context, mayor: result.mayor, currentEvent: null, phase: 'carriere' })
