@@ -21,6 +21,11 @@ export interface GameEvent {
   title: string
   description: string
   choices: EventChoice[]
+  condition?: {
+    stat: StatName
+    min?: number
+    max?: number
+  }
 }
 
 export interface EventChoice {

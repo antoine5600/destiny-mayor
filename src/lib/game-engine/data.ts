@@ -167,6 +167,7 @@ export const EVENTS: GameEvent[] = [
     id: 'festival',
     title: 'Festival culturel',
     description: 'Un organisateur propose un grand festival dans votre ville. Gros potentiel touristique mais risqué.',
+    condition: { stat: 'opinion', min: 60 },
     choices: [
       { label: 'Financer généreusement', effects: { budget: -10, opinion: 20, infrastructure: 5 }, description: 'Le festival est un succès, la ville rayonne.' },
       { label: 'Accorder un petit budget', effects: { budget: -3, opinion: 8, infrastructure: 0 }, description: 'Petit événement sympa mais sans grand retentissement.' },
@@ -177,6 +178,7 @@ export const EVENTS: GameEvent[] = [
     id: 'casse',
     title: 'Vague de cambriolages',
     description: 'Une série de cambriolages inquiète les habitants. La sécurité est remise en question.',
+    condition: { stat: 'securite', max: 25 },
     choices: [
       { label: 'Augmenter les effectifs de police', effects: { budget: -20, securite: 20, opinion: 10 }, description: 'La délinquance baisse nettement.' },
       { label: 'Lancer un programme de voisinage', effects: { budget: -5, securite: 10, opinion: 5, education: 5 }, description: 'Prévention citoyenne, résultats modestes mais durables.' },
@@ -278,6 +280,7 @@ export const EVENTS: GameEvent[] = [
     id: 'tensions-banlieue',
     title: 'Tensions en périphérie',
     description: 'Une nuit de violences urbaines éclate dans un quartier sensible. Des voitures brûlent, des commerces sont vandalisés. La situation est tendue, et les habitants du centre-ville ont peur.',
+    condition: { stat: 'opinion', max: 25 },
     choices: [
       { label: 'Dialoguer avec les jeunes du quartier', effects: { budget: -10, opinion: 10, education: 15, securite: 5 }, description: 'Vous tendez la main. Les échanges sont durs mais sincères. Un vrai travail de fond commence.' },
       { label: 'Renforcer la présence policière', effects: { budget: -15, opinion: 5, securite: 20 }, description: 'Les CRS patrouillent, le calme revient. Mais la défiance entre la police et la jeunesse s\'aggrave.' },
@@ -440,6 +443,7 @@ export const EVENTS: GameEvent[] = [
     id: 'nouveau-marche',
     title: 'Nouveau marché de producteurs',
     description: 'Des agriculteurs locaux proposent de créer un marché de producteurs bio chaque samedi. La mairie doit fournir les emplacements et la logistique, mais les retombées fiscales sont prometteuses.',
+    condition: { stat: 'opinion', min: 40 },
     choices: [
       { label: 'Soutenir le marché avec des investissements', effects: { budget: 10, opinion: 15, infrastructure: 5 }, description: 'Le marché attire des visiteurs de toute la région. Les commerces de proximité bénéficient de l\'afflux.' },
       { label: 'Accorder les emplacements sans frais', effects: { budget: 3, opinion: 10, securite: 0 }, description: 'Petit mais sympa. Les producteurs sont contents, les clients aussi.' },
@@ -474,6 +478,62 @@ export const EVENTS: GameEvent[] = [
       { label: 'Approuver toutes les optimisations', effects: { budget: 20, opinion: 0, infrastructure: 5 }, description: 'Les comptes sont assainis sans douleur. Personne ne remarque les changements, mais le budget respire.' },
       { label: 'N\'appliquer que les économies les plus sûres', effects: { budget: 10, opinion: 3, securite: 5 }, description: 'Prudence paie. Petites économies, petit risque.' },
       { label: 'Maintenir le statu quo', effects: { budget: -5, opinion: 5, securite: 0 }, description: 'Pas de risque politique, mais le gaspillage continue. Votre directeur financier est déçu.' },
+    ],
+  },
+  // ★ Événements conditionnels (selon les stats)
+  {
+    id: 'manifestation',
+    title: 'Manifestation populaire',
+    description: 'Des centaines d\'habitants manifestent devant la mairie. Ils réclament des comptes sur la gestion de la ville, des emplois et des services publics de qualité.',
+    condition: { stat: 'opinion', max: 20 },
+    choices: [
+      { label: 'Aller discuter avec les manifestants', effects: { budget: -5, opinion: 15, securite: 5, education: 5 }, description: 'Vous tendez la main. Le dialogue est houleux mais sincère. La foule se disperse.' },
+      { label: 'Promettre des réformes ambitieuses', effects: { budget: -15, opinion: 10, securite: 0 }, description: 'Annonces choc : nouveaux emplois, investissements. La pression retombe, reste à tenir vos promesses.' },
+      { label: 'Ignorer et maintenir le cap', effects: { budget: 5, opinion: -20, securite: -10 }, description: 'La manifestation dégénère. Les vitrines de la mairie sont brisées. Votre popularité s\'effondre.' },
+    ],
+  },
+  {
+    id: 'greve-generale',
+    title: 'Grève des transports',
+    description: 'Les conducteurs de bus et de tramway cessent le travail. La ville est paralysée, les habitants ne peuvent plus se déplacer. Les écoles signalent des absences massives.',
+    condition: { stat: 'opinion', max: 30 },
+    choices: [
+      { label: 'Accorder des augmentations et améliorations', effects: { budget: -15, opinion: 10, education: 5, securite: 5 }, description: 'Les transports reprennent. Les conducteurs sont satisfaits, mais le budget en prend un coup.' },
+      { label: 'Médiation et compromis', effects: { budget: -5, opinion: 5, infrastructure: 5 }, description: 'Accord trouvé après trois jours. Personne n\'est ravi, mais la ville respire.' },
+      { label: 'Réquisitionner les conducteurs', effects: { budget: 5, opinion: -15, securite: -5 }, description: 'Les bus roulent sous la menace. La population vous accuse d\'autoritarisme.' },
+    ],
+  },
+  {
+    id: 'crise-financiere',
+    title: 'Alerte budgétaire',
+    description: 'Les comptes de la ville sont dans le rouge. La chambre régionale des comptes vous adresse un avertissement. Sans mesures drastiques, la tutelle de l\'État menace.',
+    condition: { stat: 'budget', max: 10 },
+    choices: [
+      { label: 'Augmenter les impôts locaux', effects: { budget: 20, opinion: -20, securite: 0 }, description: 'Les impôts augmentent de 10%. Le budget respire, mais les habitants râlent dans tous les cafés.' },
+      { label: 'Couper dans les dépenses non essentielles', effects: { budget: 10, opinion: -5, infrastructure: -5, education: -5 }, description: 'Subventions et festivités supprimées. Austère mais efficace.' },
+      { label: 'Négocier un prêt avec l\'État', effects: { budget: 15, opinion: -5, securite: 0 }, description: 'L\'État vous prête à taux zéro. Ouf de soulagement, mais la dette vous suit comme une ombre.' },
+    ],
+  },
+  {
+    id: 'universite-ete',
+    title: 'Université d\'été',
+    description: 'Une grande université propose d\'organiser son campus d\'été dans votre ville. Des centaines d\'étudiants et de chercheurs pendant deux mois. Retombées économiques et culturelles.',
+    condition: { stat: 'education', min: 55 },
+    choices: [
+      { label: 'Accueillir avec enthousiasme et financer', effects: { budget: -10, opinion: 15, education: 15, infrastructure: 5 }, description: 'Le campus d\'été est un succès. La ville vit au rythme des conférences et des débats.' },
+      { label: 'Accueillir sans investir', effects: { budget: 5, opinion: 8, education: 8 }, description: 'L\'université s\'installe dans des locaux existants. Sympa mais moins ambitieux.' },
+      { label: 'Refuser, trop de logistique', effects: { budget: 5, opinion: -5, education: -5 }, description: 'L\'université choisit une autre ville. Les étudiants ne viendront pas.' },
+    ],
+  },
+  {
+    id: 'violences-urbaines',
+    title: 'Insécurité croissante',
+    description: 'Les agressions et les vols se multiplient dans le centre-ville. Les commerçants ferment plus tôt, les habitants ont peur de sortir le soir. La police locale est dépassée.',
+    condition: { stat: 'securite', max: 20 },
+    choices: [
+      { label: 'Renforcer massivement les patrouilles', effects: { budget: -20, opinion: 10, securite: 20 }, description: 'La présence policière dissuade les malfaiteurs. Le calme revient peu à peu.' },
+      { label: 'Lancer des ateliers de prévention', effects: { budget: -8, opinion: 5, securite: 10, education: 10 }, description: 'Prévention et médiation de rue. Lent mais durable. Les jeunes s\'impliquent.' },
+      { label: 'Déployer des caméras de surveillance', effects: { budget: -10, opinion: -10, securite: 15 }, description: 'Les caméras flashent partout. La délinquance baisse mais les libertés individuelles sont questionnées.' },
     ],
   },
 ]

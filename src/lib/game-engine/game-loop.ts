@@ -43,10 +43,22 @@ export function renewMandate(mayor: Mayor, city: City): GameContext {
   }
 }
 
-/** Tire un événement aléatoire */
-export function drawRandomEvent(avoidIds: string[] = []): GameEvent | null {
-  const available = EVENTS.filter(e => !avoidIds.includes(e.id))
-  if (available.length === 0) return null
+/** Tire un événement aléatoire selon les stats du maire */
+export function drawRandomEvent(stats: Stats, avoidIds: string[] = []): GameEvent | null {
+  const available = EVENTS.filter(e => {
+    if (avoidIds.includes(e.id)) return false
+    if (!e.condition) return true // pas de condition = toujours disponible
+    const val = stats[e.condition.stat]
+    const minOk = e.condition.min === undefined || val >= e.condition.min
+    const maxOk = e.condition.max === undefined || val <= e.condition.max
+    return minOk && maxOk
+  })
+  if (available.length === 0) {
+    // Fallback : événements sans condition
+    const fallback = EVENTS.filter(e => !e.condition && !avoidIds.includes(e.id))
+    if (fallback.length === 0) return null
+    return fallback[Math.floor(Math.random() * fallback.length)]
+  }
   return available[Math.floor(Math.random() * available.length)]
 }
 
@@ -82,7 +94,7 @@ export function advanceYear(context: GameContext): GameContext {
   let newEvent: GameEvent | null = null
   if (eventHappens) {
     const usedIds = mayor.career.flatMap(e => e.eventsHappened)
-    newEvent = drawRandomEvent(usedIds)
+    newEvent = drawRandomEvent(mayor.stats, usedIds)
   }
 
   return {
