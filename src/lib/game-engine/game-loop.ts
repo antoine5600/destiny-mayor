@@ -10,7 +10,7 @@ import {
   computeScore,
 } from './data'
 
-/** Démarre un mandat dans une ville */
+/** Démarre un mandat dans une ville (applique bonus/malus) */
 export function startMandate(mayor: Mayor, city: City): GameContext {
   const initialStats = applyCityModifiers({ ...mayor.stats }, city)
 
@@ -18,6 +18,21 @@ export function startMandate(mayor: Mayor, city: City): GameContext {
     mayor: {
       ...mayor,
       stats: initialStats,
+      currentCityId: city.id,
+    },
+    currentCity: city,
+    currentEvent: null,
+    phase: 'carriere',
+    yearInMandate: 0,
+    mandateLength: MANDATE_LENGTH[city.size],
+  }
+}
+
+/** Renouvelle un mandat dans la même ville (sans réappliquer les bonus/malus) */
+export function renewMandate(mayor: Mayor, city: City): GameContext {
+  return {
+    mayor: {
+      ...mayor,
       currentCityId: city.id,
     },
     currentCity: city,

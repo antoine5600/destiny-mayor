@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   startMandate,
+  renewMandate,
   advanceYear,
   resolveEventChoice,
   endMandate,
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
         if (!city) {
           return NextResponse.json({ error: 'Aucune ville en cours.' }, { status: 400 })
         }
-        const newContext = startMandate(context.mayor as Mayor, city)
+        const newContext = renewMandate(context.mayor as Mayor, city)
         return NextResponse.json({ success: true, data: newContext })
       }
 
