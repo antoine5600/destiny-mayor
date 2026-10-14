@@ -536,6 +536,62 @@ export const EVENTS: GameEvent[] = [
       { label: 'Déployer des caméras de surveillance', effects: { budget: -10, opinion: -10, securite: 15 }, description: 'Les caméras flashent partout. La délinquance baisse mais les libertés individuelles sont questionnées.' },
     ],
   },
+  // ★ Événements haut-stats (> 70)
+  {
+    id: 'sommet-economique',
+    title: 'Sommet économique',
+    description: 'Un forum international des investisseurs s\'intéresse à votre ville. Votre gestion budgétaire exemplaire attire les convoitises.',
+    condition: { stat: 'budget', min: 70 },
+    choices: [
+      { label: 'Accueillir les investisseurs', effects: { budget: 10, opinion: 15, infrastructure: 15, education: 5 }, description: 'Deux entreprises s\'installent. La prospérité est au rendez-vous.' },
+      { label: 'Organiser un salon professionnel', effects: { budget: 5, opinion: 10, infrastructure: 10 }, description: 'Le salon modeste mais des contacts sont pris.' },
+      { label: 'Temporiser', effects: { budget: -5, opinion: -5, securite: 5 }, description: 'Les investisseurs repartent, opportunité perdue.' },
+    ],
+  },
+  {
+    id: 'recompense-education',
+    title: 'Prix national d\'éducation',
+    description: 'Votre ville reçoit un prix national pour la qualité de ses écoles. Le ministre de l\'Éducation veut venir remettre la récompense.',
+    condition: { stat: 'education', min: 70 },
+    choices: [
+      { label: 'Organiser une cérémonie grandiose', effects: { budget: -10, opinion: 20, education: 10 }, description: 'Le ministre est impressionné. Des subventions nationales suivent.' },
+      { label: 'Fête sobre et citoyenne', effects: { budget: -3, opinion: 10, education: 5 }, description: 'Cérémonie simple mais chaleureuse.' },
+      { label: 'Déléguer aux écoles', effects: { budget: 5, opinion: 3, education: 0 }, description: 'L\'occasion médiatique est gâchée.' },
+    ],
+  },
+  {
+    id: 'securite-modele',
+    title: 'Modèle de sécurité',
+    description: 'La ville est classée parmi les plus sûres du pays. Les assurances baissent leurs primes dans la commune.',
+    condition: { stat: 'securite', min: 70 },
+    choices: [
+      { label: 'Campagne nationale de communication', effects: { budget: -5, opinion: 15, securite: 5, infrastructure: 5 }, description: 'La ville devient une référence.' },
+      { label: 'Réinvestir les économies', effects: { budget: 10, opinion: 5, securite: 10 }, description: 'Moins de délinquance = moins de dépenses.' },
+      { label: 'Maintenir le cap', effects: { budget: 5, opinion: 0, securite: 0 }, description: 'Satisfaisant mais sans éclat.' },
+    ],
+  },
+  {
+    id: 'rayonnement-culturel',
+    title: 'Rayonnement culturel',
+    description: 'Votre ville attire l\'attention d\'un magazine international qui veut la classer parmi les « 10 villes où il fait bon vivre ».',
+    condition: { stat: 'opinion', min: 70 },
+    choices: [
+      { label: 'Ouvrir les portes aux journalistes', effects: { budget: -8, opinion: 20, education: 5, infrastructure: 5 }, description: 'Le reportage est un carton. Visibilité mondiale.' },
+      { label: 'Brochure touristique modeste', effects: { budget: -3, opinion: 8, infrastructure: 3 }, description: 'Petit coup de com\'.' },
+      { label: 'Décliner l\'interview', effects: { budget: 5, opinion: -10, securite: 0 }, description: 'La ville voisine prend la lumière.' },
+    ],
+  },
+  {
+    id: 'lgv',
+    title: 'Ligne à grande vitesse',
+    description: 'Un projet de liaison ferroviaire est à l\'étude. Les ingénieurs proposent de faire passer la LGV par votre ville.',
+    condition: { stat: 'infrastructure', min: 70 },
+    choices: [
+      { label: 'Soutenir le passage de la LGV', effects: { budget: -15, opinion: 15, infrastructure: 20, education: 5 }, description: 'La ville est reliée à la capitale en une heure.' },
+      { label: 'Gare en périphérie', effects: { budget: -8, opinion: 8, infrastructure: 10 }, description: 'Compromis acceptable.' },
+      { label: 'S\'opposer au projet', effects: { budget: 5, opinion: -10, infrastructure: -10 }, description: 'Votre ville reste à l\'écart.' },
+    ],
+  },
 ]
 
 /** Calcule le score final */

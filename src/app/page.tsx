@@ -187,7 +187,32 @@ export default function Home() {
     )
   }
 
-  // ===== Phase : Événement =====
+  // ===== Destitution (doit être AVANT événement) =====
+  if (careerResult && careerResult.destituted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 flex items-center justify-center">
+        <div className="max-w-lg w-full space-y-6 text-center">
+          <span className="text-7xl">💀</span>
+          <h2 className="text-3xl font-bold text-red-500">Destitué !</h2>
+          <p className="text-xl text-slate-300">Maire {careerResult.mayor.name}</p>
+          <p className="text-slate-400">
+            Votre carrière politique s'achève brutalement. Les électeurs vous ont retiré leur confiance et les affaires courantes sont confiées à votre adjoint.
+          </p>
+          <div className="p-4 rounded-lg bg-red-900/20 border border-red-800">
+            <p className="text-sm text-red-400">Aucune ville ne veut plus de vous comme maire.</p>
+          </div>
+          <button
+            onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); }}
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold"
+          >
+            ★ Nouvelle partie ★
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ===== Phase : Événement (destitution est prioritaire au-dessus) =====
   if (gameCtx.phase === 'evenement' && gameCtx.currentEvent) {
     const ev = gameCtx.currentEvent
     const currentStats = gameCtx.mayor?.stats
@@ -240,31 +265,6 @@ export default function Home() {
             ))}
           </div>
           {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-        </div>
-      </div>
-    )
-  }
-
-  // ===== Destitution =====
-  if (careerResult && careerResult.destituted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6 text-center">
-          <span className="text-7xl">💀</span>
-          <h2 className="text-3xl font-bold text-red-500">Destitué !</h2>
-          <p className="text-xl text-slate-300">Maire {careerResult.mayor.name}</p>
-          <p className="text-slate-400">
-            Votre carrière politique s'achève brutalement. Les électeurs vous ont retiré leur confiance et les affaires courantes sont confiées à votre adjoint.
-          </p>
-          <div className="p-4 rounded-lg bg-red-900/20 border border-red-800">
-            <p className="text-sm text-red-400">Aucune ville ne veut plus de vous comme maire.</p>
-          </div>
-          <button
-            onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); }}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold"
-          >
-            ★ Nouvelle partie ★
-          </button>
         </div>
       </div>
     )
