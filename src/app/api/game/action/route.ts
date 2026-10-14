@@ -18,6 +18,7 @@ type Action =
   | { type: 'resolve-event'; choiceIndex: number }
   | { type: 'end-mandate' }
   | { type: 'move-city'; cityId: string }
+  | { type: 'stay-in-city' }
   | { type: 'retire' }
   | { type: 'get-accessible-cities' }
 
@@ -76,6 +77,15 @@ export async function POST(request: NextRequest) {
         if (!newContext) {
           return NextResponse.json({ error: 'Ville inaccessible.' }, { status: 400 })
         }
+        return NextResponse.json({ success: true, data: newContext })
+      }
+
+      case 'stay-in-city': {
+        const city = context.currentCity
+        if (!city) {
+          return NextResponse.json({ error: 'Aucune ville en cours.' }, { status: 400 })
+        }
+        const newContext = startMandate(context.mayor as Mayor, city)
         return NextResponse.json({ success: true, data: newContext })
       }
 

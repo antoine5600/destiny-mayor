@@ -304,6 +304,137 @@ export const EVENTS: GameEvent[] = [
       { label: 'Laisser faire et espérer la pluie', effects: { budget: 10, opinion: -20, infrastructure: -10 }, description: 'Un agriculteur perd son troupeau. Les habitants vous pardonnent mal votre inaction.' },
     ],
   },
+  // ★ Nouveaux événements (13) — équilibrés
+  {
+    id: 'cyberattaque',
+    title: 'Cyberattaque',
+    description: 'Un rançongiciel paralyse les services municipaux. Les bases de données sont chiffrées et les pirates réclament une rançon en cryptomonnaies.',
+    choices: [
+      { label: 'Payer la rançon et sécuriser le système', effects: { budget: -25, opinion: 5, securite: 10 }, description: 'Les données sont récupérées, mais la rançon a vidé le budget. Vous investissez dans la cybersécurité.' },
+      { label: 'Refuser de payer et reconstruire', effects: { budget: -10, opinion: -10, securite: -5 }, description: 'Sans rançon, la reconstruction prend des mois. Les services sont perturbés et la population s\'impatiente.' },
+      { label: 'Lancer une enquête numérique', effects: { budget: -5, opinion: -5, education: 10 }, description: 'Vous traquez les pirates avec des experts. Certaines données sont perdues mais l\'enquête fait grand bruit.' },
+    ],
+  },
+  {
+    id: 'concours-pret',
+    title: 'Projet de nouveau pont',
+    description: 'Un concours d\'architecture est lancé pour remplacer le vieux pont qui s\'effondre. Les propositions fusent : un pont moderne spectaculaire ou une réplique historique.',
+    choices: [
+      { label: 'Choisir le design moderne audacieux', effects: { budget: -20, opinion: 10, infrastructure: 20 }, description: 'Le pont devient une attraction. La ville gagne en notoriété mais le budget explose.' },
+      { label: 'Opter pour une reconstruction à l\'identique', effects: { budget: -10, opinion: 8, infrastructure: 10 }, description: 'Les traditionalistes sont ravis. Le pont est solide mais moins impressionnant.' },
+      { label: 'Reporter et colmater', effects: { budget: 5, opinion: -10, infrastructure: -10 }, description: 'Économies immédiates, mais un camion finit par passer à travers le pont. Scandale.' },
+    ],
+  },
+  {
+    id: 'invasion-rats',
+    title: 'Invasion de rats',
+    description: 'Les rats pullulent dans les égouts et remontent dans les quartiers résidentiels. Les habitants ont peur et les restaurants perdent leur clientèle.',
+    choices: [
+      { label: 'Lancer une grande dératisation', effects: { budget: -15, opinion: 10, securite: 5 }, description: 'Campagne choc : les rats reculent. Les restaurateurs vous remercient.' },
+      { label: 'Proposer des primes aux chasseurs de rats', effects: { budget: -5, opinion: 5, securite: 0 }, description: 'Les chasseurs ramènent des queues de rats contre récompense. Efficace mais folklorique.' },
+      { label: 'Nier l\'ampleur du problème', effects: { budget: 5, opinion: -15, infrastructure: -5 }, description: 'Les rats sont de sortie, littéralement. La ville devient la risée des médias.' },
+    ],
+  },
+  {
+    id: 'collecte-dechets',
+    title: 'Réforme des déchets',
+    description: 'L\'État impose une nouvelle taxe sur l\'enfouissement des déchets et exige le tri sélectif. Les habitudes doivent changer, et vite.',
+    choices: [
+      { label: 'Installer des bacs connectés et former les habitants', effects: { budget: -15, opinion: 5, infrastructure: 10, education: 5 }, description: 'Investissement lourd mais les taux de recyclage grimpent. La ville devient un modèle.' },
+      { label: 'Imposer des amendes pour non-tri', effects: { budget: 5, opinion: -15, securite: 0 }, description: 'Les amendes rapportent mais les habitants râlent. Des poubelles sauvages apparaissent.' },
+      { label: 'Faire le minimum légal et communiquer', effects: { budget: 5, opinion: -5, infrastructure: -5 }, description: 'Vous évitez la sanction mais l\'opinion vous trouve laxiste sur l\'environnement.' },
+    ],
+  },
+  {
+    id: 'feu-foret',
+    title: 'Incendie de forêt',
+    description: 'Un feu de forêt se rapproche dangereusement des habitations en lisière de la ville. Les pompiers sont débordés et le vent tourne.',
+    choices: [
+      { label: 'Débloquer des moyens aériens exceptionnels', effects: { budget: -20, opinion: 15, securite: 10 }, description: 'Les Canadair arrivent. Le feu est contenu. Les habitants vous acclament.' },
+      { label: 'Mobiliser les citoyens et créer des pare-feux', effects: { budget: -5, opinion: 10, infrastructure: 5 }, description: 'La solidarité joue à plein. Tout le monde donne un coup de main, le feu est maîtrisé.' },
+      { label: 'Attendre les renforts régionaux', effects: { budget: 5, opinion: -10, securite: -15 }, description: 'Le feu gagne du terrain. Deux maisons brûlent. Votre gestion est critiquée.' },
+    ],
+  },
+  {
+    id: 'reserve-naturelle',
+    title: 'Réserve naturelle',
+    description: 'Des écologistes proposent de classer une partie des terres municipales en réserve naturelle. Les agriculteurs s\'y opposent farouchement.',
+    choices: [
+      { label: 'Soutenir la réserve naturelle', effects: { budget: -5, opinion: 5, infrastructure: -5, education: 10 }, description: 'La biodiversité est protégée. La ville attire les touristes verts, mais les agriculteurs fulminent.' },
+      { label: 'Trouver un compromis agricole', effects: { budget: 0, opinion: 15, education: 5 }, description: 'Zone protégée sur 50%, agriculture raisonnée sur 50%. Tout le monde grogne, mais ça tient.' },
+      { label: 'Refuser, priorité à l\'agriculture', effects: { budget: 5, opinion: -10, securite: 5 }, description: 'Les terres restent cultivées. Les écologistes vous vouent aux gémonies.' },
+    ],
+  },
+  {
+    id: 'pole-sportif',
+    title: 'Complexe sportif',
+    description: 'Un club local ambitionne de construire un complexe sportif couvert. Piscine, gymnase, terrains. Le projet galvanise la jeunesse mais divise le conseil.',
+    choices: [
+      { label: 'Financer un grand complexe polyvalent', effects: { budget: -20, opinion: 15, infrastructure: 5, education: 5 }, description: 'Le complexe ouvre. Les jeunes affluent, le club professionnel s\'installe. La ville rayonne.' },
+      { label: 'Construire un équipement modeste', effects: { budget: -8, opinion: 8, infrastructure: 5 }, description: 'Petit gymnase et city-stade. Pas de quoi attirer les foules, mais les habitants l\'utilisent.' },
+      { label: 'Refuser, priorité aux routes', effects: { budget: 10, opinion: -15, securite: 5 }, description: 'Pas de sport, des nids-de-poule. Les jeunes traînent dans la rue.' },
+    ],
+  },
+  {
+    id: 'partenariat-jumelage',
+    title: 'Jumelage international',
+    description: 'Une ville japonaise propose un jumelage. Échanges culturels, touristiques et économiques à la clé. Mais l\'organisation d\'une cérémonie officielle coûte cher.',
+    choices: [
+      { label: 'Accepter et organiser une grande fête', effects: { budget: -10, opinion: 20, education: 10 }, description: 'Le jumelage est un succès médiatique. Les échanges scolaires commencent dès l\'année suivante.' },
+      { label: 'Accepter sobrement, sans cérémonie', effects: { budget: -3, opinion: 8, education: 5 }, description: 'Jumelage signé. Pas de faste, mais les liens se tissent doucement.' },
+      { label: 'Décliner, pas le moment', effects: { budget: 5, opinion: -5, securite: 0 }, description: 'Vous êtes jugé trop provincial. L\'occasion ne se représentera pas.' },
+    ],
+  },
+  {
+    id: 'boule-neige',
+    title: 'Tempête de neige',
+    description: 'Cinquante centimètres de neige tombent en une nuit. La ville est paralysée, les personnes âgées manquent de nourriture et de médicaments.',
+    choices: [
+      { label: 'Déployer l\'armée pour le déneigement', effects: { budget: -15, opinion: 15, infrastructure: 10, securite: 5 }, description: 'Les routes sont dégagées en 24h. La solidarité nationale s\'organise.' },
+      { label: 'Organiser des brigades citoyennes', effects: { budget: -5, opinion: 10, infrastructure: 5 }, description: 'Pelles et bonnes volontés. Les voisins s\'entraident, la ville tient.' },
+      { label: 'Limiter les déplacements et attendre', effects: { budget: 5, opinion: -10, infrastructure: -10 }, description: 'Le dégel arrive. Mais trois jours de coupure, c\'est trop. Les média vous tombent dessus.' },
+    ],
+  },
+  {
+    id: 'canal-musical',
+    title: 'Nouveau conservatoire',
+    description: 'Un chef d\'orchestre de renom propose d\'ouvrir un conservatoire de musique dans l\'ancien théâtre municipal à l\'abandon. L\'acoustique est parfaite, les travaux titanesques.',
+    choices: [
+      { label: 'Saisir la chance et rénover le théâtre', effects: { budget: -25, opinion: 15, education: 15 }, description: 'Le conservatoire ouvre dans un lieu magnifique. Des étudiants viennent de tout le pays.' },
+      { label: 'Proposer une aile du centre culturel', effects: { budget: -8, opinion: 5, education: 8 }, description: 'Modeste mais fonctionnel. Le chef accepte, un peu déçu, mais l\'enseignement commence.' },
+      { label: 'Refuser, pas de budget pour la culture', effects: { budget: 10, opinion: -10, education: -5 }, description: 'Le théâtre reste en ruine. Le chef part dans la ville voisine.' },
+    ],
+  },
+  {
+    id: 'marathon',
+    title: 'Marathon de la ville',
+    description: 'Un groupe d\'athlètes propose d\'organiser un marathon international traversant la ville et ses plus beaux monuments. L\'événement pourrait attirer des milliers de visiteurs.',
+    choices: [
+      { label: 'Financer un marathon grandiose', effects: { budget: -15, opinion: 15, infrastructure: 5, securite: 5 }, description: 'Le marathon est une réussite. La ville apparaît sur les écrans du monde entier.' },
+      { label: 'Organiser une course amateur', effects: { budget: -3, opinion: 8, securite: 0 }, description: 'Petite course sympathique. Les locaux participent en famille. Ambiance conviviale.' },
+      { label: 'Refuser pour éviter les perturbations', effects: { budget: 5, opinion: -8, securite: 5 }, description: 'Trop de contraintes. Les sportifs vous reprochent votre immobilisme.' },
+    ],
+  },
+  {
+    id: 'attentat',
+    title: 'Alerte à la bombe',
+    description: 'Une menace d\'attentat vise un bâtiment public. Les services de sécurité demandent l\'évacuation de la mairie et du marché de Noël en pleine affluence.',
+    choices: [
+      { label: 'Évacuer et annuler le marché', effects: { budget: -10, opinion: 15, securite: 15 }, description: 'Prudence maximale. La menace se révèle être une fausse alerte, mais vous avez protégé des vies.' },
+      { label: 'Évacuer discrètement sans panique', effects: { budget: -5, opinion: 5, securite: 10 }, description: 'Les forces de l\'ordre gèrent en silence. Personne ne panique, le calme règne.' },
+      { label: 'Minimiser et maintenir les activités', effects: { budget: 5, opinion: -15, securite: -15 }, description: 'La menace est réelle. Une bombe factice est retrouvée, le gouvernement vous recadre sévèrement.' },
+    ],
+  },
+  {
+    id: 'solde-budget',
+    title: 'Excédent budgétaire',
+    description: 'Pour la première fois depuis dix ans, la ville dégage un excédent budgétaire significatif. La population attend des gestes forts, mais l\'opposition veut des économies.',
+    choices: [
+      { label: 'Baisser les impôts locaux', effects: { budget: -15, opinion: 20, securite: 0 }, description: 'Les contribuables vous adorent. Moins de recettes, mais une popularité en hausse.' },
+      { label: 'Investir dans les services publics', effects: { budget: -10, opinion: 10, infrastructure: 10, education: 10 }, description: 'L\'argent sert à rénover les écoles et les voiries. Investissement durable.' },
+      { label: 'Placer l\'excédent en réserve', effects: { budget: 10, opinion: -10, securite: 0 }, description: 'Prévoyance pas toujours populaire. Les habitants vous traitent de radin.' },
+    ],
+  },
 ]
 
 /** Calcule le score final */

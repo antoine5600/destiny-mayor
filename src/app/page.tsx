@@ -17,6 +17,7 @@ type ActionType =
   | { type: 'resolve-event'; choiceIndex: number }
   | { type: 'end-mandate' }
   | { type: 'move-city'; cityId: string }
+  | { type: 'stay-in-city' }
   | { type: 'retire' }
   | { type: 'get-accessible-cities' }
 
@@ -225,6 +226,46 @@ export default function Home() {
     )
   }
 
+  // ===== Résultat de carrière (doit être AVANT fin-mandat) =====
+  if (careerResult) {
+    const gradeColors: Record<string, string> = { S: 'text-yellow-400', A: 'text-green-400', B: 'text-blue-400', C: 'text-purple-400', D: 'text-orange-400', E: 'text-red-400' }
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 flex items-center justify-center">
+        <div className="max-w-lg w-full space-y-6 text-center">
+          <span className="text-6xl">🏛️</span>
+          <h2 className="text-3xl font-bold">Carrière terminée</h2>
+          <p className="text-xl">Maire {careerResult.mayor.name}</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-slate-800 p-4 rounded-lg">
+              <p className="text-2xl font-bold text-yellow-400">{careerResult.totalYears}</p>
+              <p className="text-xs text-slate-400">Années</p>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg">
+              <p className="text-2xl font-bold text-blue-400">{careerResult.citiesGoverned}</p>
+              <p className="text-xs text-slate-400">Villes</p>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg">
+              <p className={`text-2xl font-bold ${gradeColors[careerResult.grade]}`}>{careerResult.grade}</p>
+              <p className="text-xs text-slate-400">Grade</p>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-slate-400">Score final</p>
+            <p className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+              {careerResult.finalScore}
+            </p>
+          </div>
+          <button
+            onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); setAccessibleCities([]) }}
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold hover:from-yellow-300 hover:to-orange-400 transition-all"
+          >
+            ★ Nouvelle partie ★
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // ===== Phase : Fin de mandat =====
   if (gameCtx.phase === 'fin-mandat') {
     return (
@@ -241,6 +282,13 @@ export default function Home() {
             </div>
           )}
           <div className="space-y-3">
+            <button
+              onClick={() => apiCall({ type: 'stay-in-city' })}
+              disabled={loading}
+              className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-500 font-semibold transition-all disabled:opacity-50"
+            >
+              Rester à {gameCtx.currentCity?.name} 🔄
+            </button>
             <button
               onClick={() => apiCall({ type: 'get-accessible-cities' })}
               disabled={loading}
@@ -279,46 +327,6 @@ export default function Home() {
             </div>
           )}
           {error && <p className="text-red-400 text-sm">{error}</p>}
-        </div>
-      </div>
-    )
-  }
-
-  // ===== Résultat de carrière =====
-  if (careerResult) {
-    const gradeColors: Record<string, string> = { S: 'text-yellow-400', A: 'text-green-400', B: 'text-blue-400', C: 'text-purple-400', D: 'text-orange-400', E: 'text-red-400' }
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6 text-center">
-          <span className="text-6xl">🏛️</span>
-          <h2 className="text-3xl font-bold">Carrière terminée</h2>
-          <p className="text-xl">Maire {careerResult.mayor.name}</p>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-800 p-4 rounded-lg">
-              <p className="text-2xl font-bold text-yellow-400">{careerResult.totalYears}</p>
-              <p className="text-xs text-slate-400">Années</p>
-            </div>
-            <div className="bg-slate-800 p-4 rounded-lg">
-              <p className="text-2xl font-bold text-blue-400">{careerResult.citiesGoverned}</p>
-              <p className="text-xs text-slate-400">Villes</p>
-            </div>
-            <div className="bg-slate-800 p-4 rounded-lg">
-              <p className={`text-2xl font-bold ${gradeColors[careerResult.grade]}`}>{careerResult.grade}</p>
-              <p className="text-xs text-slate-400">Grade</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-400">Score final</p>
-            <p className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-              {careerResult.finalScore}
-            </p>
-          </div>
-          <button
-            onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); setAccessibleCities([]) }}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold hover:from-yellow-300 hover:to-orange-400 transition-all"
-          >
-            ★ Nouvelle partie ★
-          </button>
         </div>
       </div>
     )

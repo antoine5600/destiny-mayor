@@ -78,8 +78,8 @@ describe('★ Villes', () => {
 })
 
 describe('★ Événements', () => {
-  it('EVENTS contient au moins 15 événements avec des choix', () => {
-    expect(EVENTS.length).toBeGreaterThanOrEqual(15)
+  it('EVENTS contient au moins 30 événements avec des choix', () => {
+    expect(EVENTS.length).toBeGreaterThanOrEqual(30)
     for (const event of EVENTS) {
       expect(event.choices.length).toBeGreaterThanOrEqual(2)
       for (const choice of event.choices) {
