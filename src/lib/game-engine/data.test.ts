@@ -129,7 +129,7 @@ describe('★ Décroissance annuelle', () => {
   it('applyYearlyDecay diminue le budget, opinion, infra', () => {
     const stats: Stats = { budget: 80, opinion: 80, infrastructure: 70, education: 50, securite: 60 }
     const result = applyYearlyDecay(stats)
-    expect(result.budget).toBe(78)   // -2
+    expect(result.budget).toBe(79)   // -1
     expect(result.opinion).toBe(79)  // -1
     expect(result.infrastructure).toBe(69) // -1
     expect(result.education).toBe(50) // 0

@@ -435,6 +435,47 @@ export const EVENTS: GameEvent[] = [
       { label: 'Placer l\'excédent en réserve', effects: { budget: 10, opinion: -10, securite: 0 }, description: 'Prévoyance pas toujours populaire. Les habitants vous traitent de radin.' },
     ],
   },
+  // ★ Nouveaux événements budget-positifs
+  {
+    id: 'nouveau-marche',
+    title: 'Nouveau marché de producteurs',
+    description: 'Des agriculteurs locaux proposent de créer un marché de producteurs bio chaque samedi. La mairie doit fournir les emplacements et la logistique, mais les retombées fiscales sont prometteuses.',
+    choices: [
+      { label: 'Soutenir le marché avec des investissements', effects: { budget: 10, opinion: 15, infrastructure: 5 }, description: 'Le marché attire des visiteurs de toute la région. Les commerces de proximité bénéficient de l\'afflux.' },
+      { label: 'Accorder les emplacements sans frais', effects: { budget: 3, opinion: 10, securite: 0 }, description: 'Petit mais sympa. Les producteurs sont contents, les clients aussi.' },
+      { label: 'Exiger des droits de place', effects: { budget: 15, opinion: -5, securite: 0 }, description: 'Les agriculteurs râlent mais paient. Recette supplémentaire non négligeable.' },
+    ],
+  },
+  {
+    id: 'zone-commerciale',
+    title: 'Extension de zone commerciale',
+    description: 'Une grande enseigne souhaite s\'implanter en périphérie, apportant emplois et taxes. Mais les petits commerçants du centre-ville craignent la concurrence déloyale.',
+    choices: [
+      { label: 'Accueillir l\'enseigne et négocier des compensations', effects: { budget: 20, opinion: 5, infrastructure: 10 }, description: 'L\'enseigne ouvre, des emplois arrivent. Vous imposez des compensations pour les petits commerces.' },
+      { label: 'Proposer une implantation en centre-ville', effects: { budget: 10, opinion: 10, infrastructure: 5 }, description: 'L\'enseigne s\'installe dans une friche commerciale rénovée. Tout le monde y trouve son compte.' },
+      { label: 'Refuser pour protéger le petit commerce', effects: { budget: -5, opinion: 15, securite: 0 }, description: 'Les petits commerçants vous soutiennent, mais les recettes fiscales stagnent.' },
+    ],
+  },
+  {
+    id: 'subventions-vertes',
+    title: 'Subventions régionales',
+    description: 'La région lance un appel à projets pour financer la transition écologique. Votre ville peut obtenir une subvention conséquente si elle présente un dossier solide.',
+    choices: [
+      { label: 'Monter un dossier ambitieux', effects: { budget: 20, opinion: 10, infrastructure: 10, education: 5 }, description: 'Le dossier est retenu ! La subvention finance l\'isolation des bâtiments publics et des panneaux solaires.' },
+      { label: 'Proposer un petit projet réaliste', effects: { budget: 10, opinion: 5, infrastructure: 5 }, description: 'Petite subvention obtenue. Quelques ampoules LED et des poubelles de tri, mais c\'est déjà ça.' },
+      { label: 'Ne pas candidater, trop de paperasse', effects: { budget: 0, opinion: -5, education: -5 }, description: 'Pas de subvention. Les écologistes locaux vous reprochent votre manque d\'ambition.' },
+    ],
+  },
+  {
+    id: 'epargne-communale',
+    title: 'Gestion financière optimisée',
+    description: 'Votre directeur financier a trouvé des économies dans le budget : des contrats d\'assurance surévalués, des abonnements inutilisés, et des subventions mal calibrées.',
+    choices: [
+      { label: 'Approuver toutes les optimisations', effects: { budget: 20, opinion: 0, infrastructure: 5 }, description: 'Les comptes sont assainis sans douleur. Personne ne remarque les changements, mais le budget respire.' },
+      { label: 'N\'appliquer que les économies les plus sûres', effects: { budget: 10, opinion: 3, securite: 5 }, description: 'Prudence paie. Petites économies, petit risque.' },
+      { label: 'Maintenir le statu quo', effects: { budget: -5, opinion: 5, securite: 0 }, description: 'Pas de risque politique, mais le gaspillage continue. Votre directeur financier est déçu.' },
+    ],
+  },
 ]
 
 /** Calcule le score final */
@@ -514,7 +555,7 @@ export const MANDATE_LENGTH: Record<CitySize, number> = {
 
 /** Évolution naturelle des stats par an */
 export const YEARLY_DECAY: Partial<Stats> = {
-  budget: -2,
+  budget: -1,
   opinion: -1,
   infrastructure: -1,
   education: 0,
