@@ -7,30 +7,58 @@ import {
   computeScore,
   canAccessCity,
   applyYearlyDecay,
-  ORIGIN_BONUSES,
+  BACKGROUND_QUESTIONS,
+  getBackgroundStats,
   CITIES,
   EVENTS,
 } from '@/lib/game-engine/data'
-import type { Stats, Mayor, Origin } from '@/types/game'
+import type { Stats, Mayor, Background } from '@/types/game'
 
-describe('★ Stats', () => {
-  it('createInitialStats retourne les bonnes stats pour chaque origine', () => {
-    const origins: Origin[] = ['rural', 'urbain', 'academique', 'entrepreneur']
-    for (const origin of origins) {
-      const stats = createInitialStats(origin)
-      const expected = ORIGIN_BONUSES[origin]
-      expect(stats).toEqual(expected)
+describe('★ Background — questions de création', () => {
+  it('BACKGROUND_QUESTIONS contient exactement 3 questions', () => {
+    expect(BACKGROUND_QUESTIONS.length).toBe(3)
+  })
+
+  it('chaque question a 4 choix avec des effets', () => {
+    for (const q of BACKGROUND_QUESTIONS) {
+      expect(q.choices.length).toBe(4)
+      for (const c of q.choices) {
+        expect(typeof c.effects).toBe('object')
+        expect(Object.keys(c.effects).length).toBeGreaterThan(0)
+      }
     }
   })
 
-  it('createInitialStats a des stats entre 0 et 100', () => {
-    const stats = createInitialStats('rural')
-    for (const value of Object.values(stats)) {
-      expect(value).toBeGreaterThanOrEqual(0)
-      expect(value).toBeLessThanOrEqual(100)
+  it('getBackgroundStats calcule les stats depuis les 3 réponses', () => {
+    const bg: Background = {
+      origins: 'famille-ouvriere',
+      studies: 'lycee-general',
+      work: 'ouvrier-artisan',
     }
+    const stats = getBackgroundStats(bg)
+    expect(stats.budget).toBeGreaterThanOrEqual(0)
+    expect(stats.opinion).toBeGreaterThanOrEqual(0)
+    expect(stats.education).toBeGreaterThanOrEqual(0)
+    const total = Object.values(stats).reduce((a, b) => a + b, 0)
+    expect(total).toBeGreaterThan(150) // Au moins la base 30×5=150
   })
+})
 
+describe('★ createInitialStats (via background)', () => {
+  it('crée des stats valides pour un background complet', () => {
+    const bg: Background = {
+      origins: 'famille-commercants',
+      studies: 'grande-ecole',
+      work: 'militant-associatif',
+    }
+    const stats = createInitialStats(bg)
+    const values = Object.values(stats)
+    expect(values.length).toBe(5)
+    expect(values.every(v => v >= 0 && v <= 100)).toBe(true)
+  })
+})
+
+describe('★ Stats — applyEffects', () => {
   it('applyEffects ajoute correctement les effets', () => {
     const stats: Stats = { budget: 50, opinion: 50, infrastructure: 50, education: 50, securite: 50 }
     const result = applyEffects(stats, { budget: 10, opinion: -5 })
@@ -90,10 +118,16 @@ describe('★ Événements', () => {
 })
 
 describe('★ Score final', () => {
+  const DEFAULT_BG: Background = {
+    origins: 'famille-ouvriere',
+    studies: 'lycee-general',
+    work: 'ouvrier-artisan',
+  }
+
   it('computeScore retourne un grade valide', () => {
     const mayor: Mayor = {
       name: 'Test',
-      origin: 'rural',
+      background: DEFAULT_BG,
       birthYear: 2025,
       stats: { budget: 70, opinion: 70, infrastructure: 70, education: 70, securite: 70 },
       currentCityId: 'saint-pierre',
@@ -111,7 +145,7 @@ describe('★ Score final', () => {
   it('computeScore donne un meilleur grade avec de meilleures stats', () => {
     const baseMayor: Mayor = {
       name: 'Test',
-      origin: 'urbain',
+      background: DEFAULT_BG,
       birthYear: 2025,
       stats: { budget: 50, opinion: 50, infrastructure: 50, education: 50, securite: 50 },
       currentCityId: null,

@@ -2,15 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import type { Origin, GameContext, CareerResult, Stats } from '@/types/game'
-import { CITIES } from '@/lib/game-engine/data'
-
-const ORIGINS: { id: Origin; label: string; emoji: string; desc: string }[] = [
-  { id: 'rural', label: 'Rural', emoji: '🏡', desc: 'Proche des habitants, budget serré' },
-  { id: 'urbain', label: 'Urbain', emoji: '🏙️', desc: 'Bon réseau, gestion budgétaire' },
-  { id: 'academique', label: 'Académique', emoji: '🎓', desc: 'Compétences en éducation' },
-  { id: 'entrepreneur', label: 'Entrepreneur', emoji: '💼', desc: 'Le budget n\'a pas de secrets' },
-]
+import type { GameContext, CareerResult, Stats, Background, BackgroundQuestion } from '@/types/game'
+import { CITIES, BACKGROUND_QUESTIONS, getBackgroundStats } from '@/lib/game-engine/data'
 
 type ActionType =
   | { type: 'start-mandate'; cityId: string }
@@ -22,10 +15,13 @@ type ActionType =
   | { type: 'retire' }
   | { type: 'get-accessible-cities' }
 
+type CreationStep = 'name' | 'origins' | 'studies' | 'work' | 'preview'
+
 export default function Home() {
   const { data: session } = useSession()
   const [name, setName] = useState('')
-  const [selectedOrigin, setSelectedOrigin] = useState<Origin | null>(null)
+  const [answers, setAnswers] = useState<Background>({ origins: '', studies: '', work: '' })
+  const [step, setStep] = useState<CreationStep>('name')
   const [gameCtx, setGameCtx] = useState<GameContext | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -67,14 +63,14 @@ export default function Home() {
   }, [gameCtx])
 
   async function startGame() {
-    if (!name.trim() || !selectedOrigin) return
+    if (!name.trim() || !answers.origins || !answers.studies || !answers.work) return
     setLoading(true)
     setError('')
     try {
       const res = await fetch('/api/game', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), origin: selectedOrigin }),
+        body: JSON.stringify({ name: name.trim(), background: answers }),
       })
       const data = await res.json()
       if (!data.success) setError(data.error || 'Erreur')
@@ -107,11 +103,10 @@ export default function Home() {
       const res = await fetch('/api/game/save')
       const data = await res.json()
       if (data.success && data.data) {
-        const { career, stats, mayorName, origin, year, currentCity, phase, yearInMandate } = data.data
-        // Rechercher la ville dans la liste complète pour avoir nom, taille, etc.
+        const { career, stats, mayorName, background, year, currentCity, phase, yearInMandate } = data.data
         const cityData = currentCity ? CITIES.find(c => c.id === currentCity) ?? null : null
         const ctx: GameContext = {
-          mayor: { name: mayorName, origin, birthYear: 2026, stats, career, currentCityId: currentCity, year, isRetired: false },
+          mayor: { name: mayorName, background, birthYear: 2026, stats, career, currentCityId: currentCity, year, isRetired: false },
           currentCity: cityData,
           currentEvent: null,
           phase,
@@ -121,6 +116,16 @@ export default function Home() {
         setGameCtx(ctx)
       } else { setError('Aucune sauvegarde trouvée.') }
     } catch { setError('Erreur de chargement.') }
+  }
+
+  function answerQuestion(questionId: keyof Background, choiceId: string) {
+    setAnswers(prev => ({ ...prev, [questionId]: choiceId }))
+    const nextSteps: Record<string, CreationStep> = {
+      origins: 'studies',
+      studies: 'work',
+      work: 'preview',
+    }
+    setStep(nextSteps[questionId] || 'preview')
   }
 
   // ===== Écran de création =====
@@ -142,55 +147,108 @@ export default function Home() {
               </button>
             )}
           </div>
+
           <div className="text-center space-y-2">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
               ★ Destiny Mayor ★
             </h1>
             <p className="text-slate-400">Écrivez votre légende politique</p>
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-300">Nom de votre maire</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Jean Politique"
-              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none"
-              maxLength={30}
-            />
+
+          {/* Barre de progression */}
+          <div className="flex gap-2 justify-center">
+            {(['name', 'origins', 'studies', 'work', 'preview'] as CreationStep[]).map((s, i) => {
+              const stepNames = ['Nom', 'Origines', 'Études', 'Métier', 'Récap']
+              const currentIdx = ['name', 'origins', 'studies', 'work', 'preview'].indexOf(step)
+              return (
+                <div key={s} className={`h-2 rounded-full transition-all ${i <= currentIdx ? 'bg-yellow-400' : 'bg-slate-700'}`}
+                  style={{ width: i === currentIdx ? '32px' : '16px' }} title={stepNames[i]} />
+              )
+            })}
           </div>
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-slate-300">Choisissez votre origine</p>
-            <div className="grid grid-cols-2 gap-3">
-              {ORIGINS.map(o => (
-                <button
-                  key={o.id}
-                  onClick={() => setSelectedOrigin(o.id)}
-                  className={`p-4 rounded-lg border-2 text-left transition-all ${
-                    selectedOrigin === o.id ? 'border-yellow-400 bg-slate-700' : 'border-slate-600 bg-slate-800 hover:border-slate-500'
-                  }`}
-                >
-                  <span className="text-2xl">{o.emoji}</span>
-                  <p className="font-semibold mt-1">{o.label}</p>
-                  <p className="text-xs text-slate-400 mt-1">{o.desc}</p>
-                </button>
-              ))}
+
+          {/* Étape : Nom */}
+          {step === 'name' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <span className="text-5xl">📜</span>
+                <h2 className="text-xl font-bold mt-2">Quel est le nom de votre maire ?</h2>
+              </div>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Jean Politique"
+                className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none"
+                maxLength={30}
+                onKeyDown={e => { if (e.key === 'Enter' && name.trim()) setStep('origins') }}
+              />
+              <button
+                onClick={() => setStep('origins')}
+                disabled={!name.trim()}
+                className="w-full py-3 rounded-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed hover:from-yellow-300 hover:to-orange-400 transition-all"
+              >
+                Suivant →
+              </button>
             </div>
-          </div>
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-          <button
-            onClick={startGame}
-            disabled={!name.trim() || !selectedOrigin || loading}
-            className="w-full py-3 rounded-lg font-bold text-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed hover:from-yellow-300 hover:to-orange-400 transition-all"
-          >
-            {loading ? 'Création...' : '★ Commencer ma carrière ★'}
-          </button>
+          )}
+
+          {/* Étapes : questions (origins, studies, work) */}
+          {(['origins', 'studies', 'work'] as string[]).includes(step) && (
+            <BackgroundQuestionStep
+              question={BACKGROUND_QUESTIONS.find(q => q.id === step)!}
+              onSelect={(choiceId) => answerQuestion(step as keyof Background, choiceId)}
+              selected={answers[step as keyof Background]}
+            />
+          )}
+
+          {/* Étape : Récapitulatif */}
+          {step === 'preview' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <span className="text-5xl">📋</span>
+                <h2 className="text-xl font-bold mt-2">Récapitulatif</h2>
+              </div>
+
+              <div className="bg-slate-800 rounded-lg p-4 space-y-2">
+                <p><span className="text-slate-400">Nom :</span> <span className="font-semibold">{name.trim()}</span></p>
+                {BACKGROUND_QUESTIONS.map(q => {
+                  const choice = q.choices.find(c => c.id === answers[q.id as keyof Background])
+                  return (
+                    <p key={q.id}>
+                      <span className="text-slate-400">{q.icon} {q.title} :</span>{' '}
+                      <span>{choice?.icon} {choice?.label}</span>
+                    </p>
+                  )
+                })}
+              </div>
+
+              <BackgroundPreviewStats bg={answers} />
+
+              {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+              <button
+                onClick={startGame}
+                disabled={loading}
+                className="w-full py-3 rounded-lg font-bold text-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed hover:from-yellow-300 hover:to-orange-400 transition-all"
+              >
+                {loading ? 'Création...' : '★ Commencer ma carrière ★'}
+              </button>
+
+              <button
+                onClick={() => setStep('work')}
+                className="w-full py-2 text-sm text-slate-400 hover:text-white transition-all"
+              >
+                ← Modifier mes réponses
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
   }
 
-  // ===== Destitution (doit être AVANT événement) =====
+  // ===== Destitution =====
   if (careerResult && careerResult.destituted) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 flex items-center justify-center">
@@ -215,7 +273,7 @@ export default function Home() {
     )
   }
 
-  // ===== Phase : Événement (destitution est prioritaire au-dessus) =====
+  // ===== Phase : Événement =====
   if (gameCtx.phase === 'evenement' && gameCtx.currentEvent) {
     const ev = gameCtx.currentEvent
     const currentStats = gameCtx.mayor?.stats
@@ -227,8 +285,6 @@ export default function Home() {
             <h2 className="text-2xl font-bold mt-2">{ev.title}</h2>
             <p className="text-slate-400 mt-2">{ev.description}</p>
           </div>
-
-          {/* Stats actuelles */}
           {currentStats && (
             <div className="grid grid-cols-5 gap-1.5">
               {Object.entries(currentStats).map(([key, value]) => (
@@ -242,7 +298,6 @@ export default function Home() {
               ))}
             </div>
           )}
-
           <div className="space-y-3">
             {ev.choices.map((choice, i) => (
               <button
@@ -273,7 +328,7 @@ export default function Home() {
     )
   }
 
-  // ===== Résultat de carrière (doit être AVANT fin-mandat) =====
+  // ===== Résultat de carrière =====
   if (careerResult) {
     const gradeColors: Record<string, string> = { S: 'text-yellow-400', A: 'text-green-400', B: 'text-blue-400', C: 'text-purple-400', D: 'text-orange-400', E: 'text-red-400' }
     return (
@@ -383,7 +438,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Auth bar */}
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             <button onClick={saveGame} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all">💾 Sauvegarder</button>
@@ -434,7 +488,7 @@ export default function Home() {
               disabled={loading}
               className="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 transition-all disabled:opacity-50"
             >
-              {loading ? '⏳ Année en cours...' : '📅 Avancer d\'un an'}
+              {loading ? '⏳ Année en cours...' : "📅 Avancer d'un an"}
             </button>
           )}
         </div>
@@ -445,6 +499,80 @@ export default function Home() {
   )
 }
 
+// ===== Composant : une question du background =====
+function BackgroundQuestionStep({
+  question,
+  onSelect,
+  selected,
+}: {
+  question: BackgroundQuestion
+  onSelect: (choiceId: string) => void
+  selected: string
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="text-center">
+        <span className="text-5xl">{question.icon}</span>
+        <h2 className="text-xl font-bold mt-2">{question.title}</h2>
+      </div>
+      <div className="space-y-3">
+        {question.choices.map(choice => (
+          <button
+            key={choice.id}
+            onClick={() => onSelect(choice.id)}
+            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+              selected === choice.id
+                ? 'border-yellow-400 bg-slate-700'
+                : 'border-slate-600 bg-slate-800 hover:border-slate-500'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{choice.icon}</span>
+              <div>
+                <p className="font-semibold">{choice.label}</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {effectToTags(choice.effects).map((tag, j) => (
+                    <span key={j} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                      tag.direction === 'up' ? 'bg-green-900/50 text-green-400' :
+                      tag.direction === 'down' ? 'bg-red-900/50 text-red-400' :
+                      'bg-slate-700 text-slate-400'
+                    }`}>
+                      {tag.icon}{tag.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ===== Composant : mini tableau des stats =====
+function BackgroundPreviewStats({ bg }: { bg: Background }) {
+  const stats = getBackgroundStats(bg)
+  return (
+    <div className="bg-slate-800 rounded-lg p-4">
+      <p className="text-sm font-medium text-slate-300 text-center mb-2">Stats de départ</p>
+      <div className="grid grid-cols-5 gap-2">
+        {Object.entries(stats).map(([key, value]) => (
+          <div key={key} className="text-center">
+            <div className="text-lg">{statEmoji(key)}</div>
+            <div className="text-[10px] text-slate-400">{statLabel(key)}</div>
+            <div className="w-full bg-slate-700 rounded-full h-1 mt-1">
+              <div className="h-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500" style={{ width: `${value}%` }} />
+            </div>
+            <div className="text-xs font-bold mt-1">{value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ===== Helpers UI =====
 function statEmoji(key: string): string {
   const map: Record<string, string> = { budget: '💰', opinion: '📊', infrastructure: '🏗️', education: '📚', securite: '🛡️' }
   return map[key] || '📌'

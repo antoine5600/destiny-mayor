@@ -39,7 +39,7 @@ export const gameSaves = sqliteTable('game_save', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
   mayorName: text('mayorName').notNull(),
-  origin: text('origin').notNull(),
+  background: text('background').notNull(),
   year: integer('year').notNull(),
   career: text('career').notNull().$default(() => '[]'),
   stats: text('stats').notNull().$default(() => '{}'),

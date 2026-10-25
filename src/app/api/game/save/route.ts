@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const data = {
     userId: session.user.id,
     mayorName: ctx.mayor.name,
-    origin: ctx.mayor.origin,
+    background: JSON.stringify(ctx.mayor.background),
     year: ctx.mayor.year,
     career: JSON.stringify(ctx.mayor.career),
     stats: JSON.stringify(ctx.mayor.stats),
@@ -61,7 +61,7 @@ export async function GET() {
     data: {
       id: save.id,
       mayorName: save.mayorName,
-      origin: save.origin,
+      background: JSON.parse(save.background),
       year: save.year,
       currentCity: save.currentCity,
       phase: save.phase,

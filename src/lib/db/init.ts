@@ -57,7 +57,7 @@ async function main() {
       "id" TEXT PRIMARY KEY,
       "userId" TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
       "mayorName" TEXT NOT NULL,
-      "origin" TEXT NOT NULL,
+      "background" TEXT NOT NULL,
       "year" INTEGER NOT NULL,
       "career" TEXT NOT NULL DEFAULT '[]',
       "stats" TEXT NOT NULL DEFAULT '{}',

@@ -1,15 +1,13 @@
 // ===== API : Initialiser une nouvelle partie ★ =====
 import { NextRequest, NextResponse } from 'next/server'
-import { createInitialStats, CITIES } from '@/lib/game-engine/data'
+import { createInitialStats, CITIES, BACKGROUND_QUESTIONS } from '@/lib/game-engine/data'
 import { startMandate } from '@/lib/game-engine/game-loop'
-import type { Origin, Mayor } from '@/types/game'
-
-const ORIGINS: Origin[] = ['rural', 'urbain', 'academique', 'entrepreneur']
+import type { Background, Mayor } from '@/types/game'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, origin } = body
+    const { name, background } = body
 
     // Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -18,9 +16,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    if (!ORIGINS.includes(origin)) {
+    if (!background || !background.origins || !background.studies || !background.work) {
       return NextResponse.json(
-        { error: `Origine invalide. Choisissez parmi : ${ORIGINS.join(', ')}` },
+        { error: 'Les 3 questions de profil sont requises.' },
         { status: 400 }
       )
     }
@@ -28,16 +26,16 @@ export async function POST(request: NextRequest) {
     const currentYear = 2026
     const mayor: Mayor = {
       name: name.trim(),
-      origin,
+      background,
       birthYear: currentYear,
-      stats: createInitialStats(origin),
+      stats: createInitialStats(background),
       currentCityId: null,
       career: [],
       year: currentYear,
       isRetired: false,
     }
 
-    // Première ville disponible selon l'origine → démarre directement le mandat
+    // Première ville → démarre directement le mandat
     const firstCity = CITIES[0]
     const context = startMandate(mayor, firstCity)
 
@@ -51,34 +49,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  const origins = ORIGINS.map(o => ({
-    id: o,
-    label: getOriginLabel(o),
-    description: getOriginDescription(o),
-  }))
-
   return NextResponse.json({
     success: true,
-    data: { origins, cities: CITIES.map(c => ({ id: c.id, name: c.name, size: c.size, difficulty: c.difficulty })) },
+    data: {
+      questions: BACKGROUND_QUESTIONS,
+      cities: CITIES.map(c => ({ id: c.id, name: c.name, size: c.size, difficulty: c.difficulty })),
+    },
   })
-}
-
-function getOriginLabel(origin: Origin): string {
-  const labels: Record<Origin, string> = {
-    rural: 'Rural 🏡',
-    urbain: 'Urbain 🏙️',
-    academique: 'Académique 🎓',
-    entrepreneur: 'Entrepreneur 💼',
-  }
-  return labels[origin]
-}
-
-function getOriginDescription(origin: Origin): string {
-  const descs: Record<Origin, string> = {
-    rural: 'Vous avez grandi à la campagne. Proche des habitants, mais peu de budget.',
-    urbain: 'Vous venez de la ville. Bon réseau, bonne gestion budgétaire.',
-    academique: 'Vous sortez des grandes écoles. Très compétent en éducation.',
-    entrepreneur: 'Vous avez monté votre entreprise. Le budget n\'a pas de secrets pour vous.',
-  }
-  return descs[origin]
 }

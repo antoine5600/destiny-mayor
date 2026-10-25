@@ -14,7 +14,11 @@ import type { Mayor, GameContext } from '@/types/game'
 function createTestMayor(overrides: Partial<Mayor> = {}): Mayor {
   return {
     name: 'Test',
-    origin: 'rural',
+    background: {
+      origins: 'famille-ouvriere',
+      studies: 'lycee-general',
+      work: 'ouvrier-artisan',
+    },
     birthYear: 2026,
     stats: { budget: 50, opinion: 50, infrastructure: 50, education: 50, securite: 50 },
     currentCityId: null,

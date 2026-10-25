@@ -1,49 +1,59 @@
 // ===== Tests de l'API ★ =====
 import { describe, it, expect } from 'vitest'
 import { createInitialStats } from '@/lib/game-engine/data'
+import type { Background } from '@/types/game'
 
 describe('★ API /api/game', () => {
-  // On teste la logique métier qui sert l'API
-  const VALID_BODY = { name: 'Jean Maire', origin: 'rural' }
-  const INVALID_BODIES = [
-    { body: { name: '', origin: 'rural' }, expectedStatus: 400, label: 'nom vide' },
-    { body: { origin: 'rural' }, expectedStatus: 400, label: 'nom manquant' },
-    { body: { name: 'Test', origin: 'invalide' }, expectedStatus: 400, label: 'origine invalide' },
-    { body: { name: 'Test', origin: '' }, expectedStatus: 400, label: 'origine vide' },
-    { body: {}, expectedStatus: 400, label: 'corps vide' },
-  ]
+  const VALID_BG: Background = {
+    origins: 'famille-ouvriere',
+    studies: 'lycee-general',
+    work: 'ouvrier-artisan',
+  }
 
-  it('valide qu\'un body correct est accepté', () => {
-    // La validation de l'API
-    expect(VALID_BODY.name).toBeTruthy()
-    expect(VALID_BODY.name.trim().length).toBeGreaterThan(0)
-    expect(['rural', 'urbain', 'academique', 'entrepreneur']).toContain(VALID_BODY.origin)
+  it("valide qu'un body correct est accepté", () => {
+    expect(VALID_BG.origins).toBeTruthy()
+    expect(VALID_BG.studies).toBeTruthy()
+    expect(VALID_BG.work).toBeTruthy()
   })
 
-  it('rejette les body invalides', () => {
-    for (const { body } of INVALID_BODIES) {
+  it('rejette les body invalides (background incomplet)', () => {
+    const invalidBodies = [
+      { name: 'Test', background: { origins: '', studies: 'lycee-general', work: 'ouvrier-artisan' } },
+      { name: 'Test', background: { origins: 'famille-ouvriere', studies: '', work: 'ouvrier-artisan' } },
+      { name: 'Test', background: { origins: 'famille-ouvriere', studies: 'lycee-general', work: '' } },
+      { name: '', background: VALID_BG },
+      {} as any,
+    ]
+    for (const body of invalidBodies) {
       const nameValid = body.name && typeof body.name === 'string' && body.name.trim().length > 0
-      const originValid = body.origin && (['rural', 'urbain', 'academique', 'entrepreneur'] as string[]).includes(body.origin)
-      if (!nameValid || !originValid) {
+      const bg = body.background as Background | undefined
+      const bgValid = bg && bg.origins && bg.studies && bg.work
+      if (!nameValid || !bgValid) {
         expect(true).toBe(true) // Rejeté ✓
       }
     }
   })
 
-  it('crée des stats initiales valides pour chaque origine', () => {
-    const origins = ['rural', 'urbain', 'academique', 'entrepreneur'] as const
-    for (const origin of origins) {
-      const stats = createInitialStats(origin)
+  it('crée des stats initiales valides pour différents background', () => {
+    const bgs: Background[] = [
+      { origins: 'famille-ouvriere', studies: 'lycee-general', work: 'ouvrier-artisan' },
+      { origins: 'famille-notables', studies: 'grande-ecole', work: 'militant-associatif' },
+      { origins: 'famille-commercants', studies: 'autodidacte', work: 'professeur-agent' },
+    ]
+    for (const bg of bgs) {
+      const stats = createInitialStats(bg)
       const values = Object.values(stats)
       expect(values.length).toBe(5)
       expect(values.every(v => v >= 0 && v <= 100)).toBe(true)
     }
   })
 
-  it('retourne une origine valide pour GET', () => {
-    const origins = ['rural', 'urbain', 'academique', 'entrepreneur']
-    expect(origins.length).toBe(4)
-    expect(origins).toContain('rural')
-    expect(origins).toContain('entrepreneur')
+  it('les stats varient selon les réponses', () => {
+    const bg1: Background = { origins: 'famille-ouvriere', studies: 'lycee-general', work: 'ouvrier-artisan' }
+    const bg2: Background = { origins: 'famille-notables', studies: 'grande-ecole', work: 'commercant-patron' }
+    const stats1 = createInitialStats(bg1)
+    const stats2 = createInitialStats(bg2)
+    // Les deux profils doivent avoir des stats différentes
+    expect(stats1).not.toEqual(stats2)
   })
 })

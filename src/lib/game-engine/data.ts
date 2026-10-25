@@ -1,12 +1,58 @@
 // ===== Données du jeu « Destiny Mayor » ★ =====
-import type { City, GameEvent, Origin, Stats, Grade, CareerResult, Mayor, CitySize } from '@/types/game'
+import type { City, GameEvent, Background, Stats, Grade, CareerResult, Mayor, CitySize, BackgroundQuestion } from '@/types/game'
 
-/** Stats de départ selon l'origine */
-export const ORIGIN_BONUSES: Record<Origin, Stats> = {
-  rural:      { budget: 30, opinion: 50, infrastructure: 30, education: 25, securite: 40 },
-  urbain:     { budget: 50, opinion: 40, infrastructure: 45, education: 40, securite: 30 },
-  academique: { budget: 25, opinion: 25, infrastructure: 30, education: 60, securite: 35 },
-  entrepreneur: { budget: 55, opinion: 30, infrastructure: 40, education: 30, securite: 35 },
+// ===== Background — questions de création du personnage =====
+
+/** Stats de base avant modificateurs du background */
+const BASE_STATS: Stats = { budget: 30, opinion: 30, infrastructure: 30, education: 30, securite: 30 }
+
+export const BACKGROUND_QUESTIONS: BackgroundQuestion[] = [
+  {
+    id: 'origins',
+    title: 'Dans quel milieu avez-vous grandi ?',
+    icon: '🏡',
+    choices: [
+      { id: 'famille-ouvriere',   icon: '🔧', label: 'Famille ouvrière ou paysanne',        effects: { budget: -5, opinion: 10, securite: 5 } },
+      { id: 'famille-commercants', icon: '🏪', label: 'Famille de commerçants',              effects: { budget: 10, opinion: 5, education: 5 } },
+      { id: 'famille-enseignants', icon: '📚', label: 'Famille d\'enseignants',              effects: { budget: -5, education: 15, opinion: 5 } },
+      { id: 'famille-notables',    icon: '🏛️', label: 'Famille de notables ou d\'élus',      effects: { budget: 10, opinion: -5, infrastructure: 5 } },
+    ],
+  },
+  {
+    id: 'studies',
+    title: 'Quel a été votre parcours d\'études ?',
+    icon: '🎓',
+    choices: [
+      { id: 'lycee-general',     icon: '📖', label: 'Lycée général + université',          effects: { education: 10, opinion: 5 } },
+      { id: 'grande-ecole',       icon: '🏫', label: 'Grande école (Sciences Po, ENA…)',    effects: { budget: 5, education: 15, opinion: -5 } },
+      { id: 'lycee-technique',    icon: '🔧', label: 'Lycée technique ou professionnel',    effects: { infrastructure: 10, securite: 5, budget: 5 } },
+      { id: 'autodidacte',        icon: '📝', label: 'Peu d\'études, autodidacte',          effects: { opinion: 10, securite: 5, budget: 5 } },
+    ],
+  },
+  {
+    id: 'work',
+    title: 'Quel était votre métier avant la politique ?',
+    icon: '💼',
+    choices: [
+      { id: 'commercant-patron',  icon: '💰', label: 'Commerçant ou chef d\'entreprise',    effects: { budget: 10, infrastructure: 5, opinion: 5 } },
+      { id: 'professeur-agent',   icon: '📋', label: 'Professeur ou fonctionnaire',         effects: { education: 10, opinion: 10 } },
+      { id: 'ouvrier-artisan',    icon: '🏗️', label: 'Ouvrier ou artisan',                  effects: { infrastructure: 10, securite: 5, opinion: 5 } },
+      { id: 'militant-associatif',icon: '🤝', label: 'Militant associatif ou syndicaliste', effects: { opinion: 10, securite: 10, education: 5 } },
+    ],
+  },
+]
+
+/** Calcule les stats de départ à partir des 3 réponses de background */
+export function getBackgroundStats(bg: Background): Stats {
+  let stats = { ...BASE_STATS }
+  for (const question of BACKGROUND_QUESTIONS) {
+    const answerId = bg[question.id as keyof Background]
+    const choice = question.choices.find(c => c.id === answerId)
+    if (choice) {
+      stats = applyEffects(stats, choice.effects)
+    }
+  }
+  return stats
 }
 
 /** Villes disponibles */
@@ -648,6 +694,7 @@ export function getCityRequirement(city: City): { stat: keyof Stats; min: number
     case 'grande-ville':   return { stat: 'opinion', min: 50 }
     case 'metropole':      return { stat: 'opinion', min: 70 }
   }
+  return { stat: 'opinion', min: 0 } // fallback
 }
 
 /** Vérifie si le maire peut accéder à une ville */
@@ -656,9 +703,9 @@ export function canAccessCity(stats: Stats, city: City): boolean {
   return stats[req.stat] >= req.min
 }
 
-/** Calcule les stats de départ */
-export function createInitialStats(origin: Origin): Stats {
-  return { ...ORIGIN_BONUSES[origin] }
+/** Calcule les stats de départ à partir du background */
+export function createInitialStats(bg: Background): Stats {
+  return getBackgroundStats(bg)
 }
 
 /** Longueur d'un mandat en années */

@@ -12,8 +12,30 @@ export type CitySize = 'petit-village' | 'ville-moyenne' | 'grande-ville' | 'met
 /** Difficulté d'une ville */
 export type CityDifficulty = 'facile' | 'moyen' | 'difficile' | 'extreme'
 
-/** Origine du personnage */
-export type Origin = 'rural' | 'urbain' | 'academique' | 'entrepreneur'
+/** Réponse à une question de background */
+export type BackgroundAnswer = string
+
+/** Les 3 réponses qui définissent le passé du maire */
+export interface Background {
+  origins: BackgroundAnswer
+  studies: BackgroundAnswer
+  work: BackgroundAnswer
+}
+
+/** Une question posée lors de la création du personnage */
+export interface BackgroundQuestion {
+  id: string
+  title: string
+  icon: string
+  choices: BackgroundChoice[]
+}
+
+export interface BackgroundChoice {
+  id: string
+  label: string
+  icon: string
+  effects: Partial<Stats>
+}
 
 /** Événement aléatoire */
 export interface GameEvent {
@@ -49,7 +71,7 @@ export interface City {
 /** État du personnage */
 export interface Mayor {
   name: string
-  origin: Origin
+  background: Background
   birthYear: number
   stats: Stats
   currentCityId: string | null

@@ -181,7 +181,7 @@ export function moveToCity(context: GameContext, cityId: string): GameContext | 
 export function retire(mayor: Mayor) {
   return computeScore({
     name: mayor.name,
-    origin: mayor.origin,
+    background: mayor.background,
     birthYear: mayor.birthYear,
     stats: mayor.stats,
     currentCityId: mayor.currentCityId,
