@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   const existing = await db.select().from(gameSaves).where(eq(gameSaves.userId, session.user.id)).limit(1)
 
   if (existing.length > 0) {
-    await db.update(gameSaves).set(data).where(eq(gameSaves.id, existing[0].id))
+    await db.update(gameSaves).set({ ...data, updatedAt: new Date() }).where(eq(gameSaves.id, existing[0].id))
     return NextResponse.json({ success: true, message: 'Partie sauvegardée !' })
   } else {
     const id = crypto.randomUUID()

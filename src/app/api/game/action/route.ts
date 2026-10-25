@@ -53,6 +53,11 @@ export async function POST(request: NextRequest) {
         }
         const result = resolveEventChoice(context.mayor as Mayor, context.currentEvent, action.choiceIndex)
 
+        // Choix invalide ?
+        if (result.eventResult === 'Choix invalide.') {
+          return NextResponse.json({ error: 'Choix invalide.' }, { status: 400 })
+        }
+
         // Destitution immédiate si une stat tombe à 0
         if (result.destituted) {
           const city = context.currentCity

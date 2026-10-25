@@ -8,17 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:init": "npx tsx src/lib/db/init.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
-    "@auth/prisma-adapter": "^2.11.3",
     "@libsql/client": "^0.18.0",
-    "@prisma/client": "^5.22.0",
     "drizzle-orm": "^0.45.4",
     "next": "16.4.0",
     "next-auth": "^5.0.0-beta.32",
-    "prisma": "^5.22.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "sql.js": "^1.14.2"

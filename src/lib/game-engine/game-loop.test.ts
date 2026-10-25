@@ -98,6 +98,24 @@ describe('★ resolveEventChoice', () => {
     const result = resolveEventChoice(mayor, event, 0)
     expect(result.eventResult.length).toBeGreaterThan(0)
   })
+
+  it('signale un choix invalide avec eventResult approprié', () => {
+    const mayor = createTestMayor()
+    const event = EVENTS[0]
+    const result = resolveEventChoice(mayor, event, 999) // Index inexistant
+    expect(result.eventResult).toBe('Choix invalide.')
+    expect(result.destituted).toBe(false)
+    // Les stats ne doivent pas changer
+    expect(result.mayor.stats).toEqual(mayor.stats)
+  })
+
+  it('détecte la destitution quand une stat tombe à 0', () => {
+    const mayor = createTestMayor({ stats: { budget: 5, opinion: 50, infrastructure: 50, education: 50, securite: 50 } })
+    const event = EVENTS[0] // Inondation, choix 0 : budget -20 → 5 - 20 = -15 → clamp à 0
+    const result = resolveEventChoice(mayor, event, 0)
+    expect(result.destituted).toBe(true)
+    expect(result.mayor.stats.budget).toBe(0)
+  })
 })
 
 describe('★ endMandate', () => {

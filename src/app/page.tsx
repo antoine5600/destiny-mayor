@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import type { Origin, GameContext, CareerResult, Stats } from '@/types/game'
+import { CITIES } from '@/lib/game-engine/data'
 
 const ORIGINS: { id: Origin; label: string; emoji: string; desc: string }[] = [
   { id: 'rural', label: 'Rural', emoji: '🏡', desc: 'Proche des habitants, budget serré' },
@@ -107,13 +108,15 @@ export default function Home() {
       const data = await res.json()
       if (data.success && data.data) {
         const { career, stats, mayorName, origin, year, currentCity, phase, yearInMandate } = data.data
+        // Rechercher la ville dans la liste complète pour avoir nom, taille, etc.
+        const cityData = currentCity ? CITIES.find(c => c.id === currentCity) ?? null : null
         const ctx: GameContext = {
           mayor: { name: mayorName, origin, birthYear: 2026, stats, career, currentCityId: currentCity, year, isRetired: false },
-          currentCity: currentCity ? { id: currentCity, name: currentCity, size: 'petit-village', difficulty: 'facile', population: 0, description: '' } : null,
+          currentCity: cityData,
           currentEvent: null,
           phase,
           yearInMandate,
-          mandateLength: 6,
+          mandateLength: cityData ? (cityData.size === 'petit-village' || cityData.size === 'ville-moyenne' ? 6 : 5) : 6,
         }
         setGameCtx(ctx)
       } else { setError('Aucune sauvegarde trouvée.') }

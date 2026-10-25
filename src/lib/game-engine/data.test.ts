@@ -123,6 +123,15 @@ describe('★ Score final', () => {
     const good = computeScore({ ...baseMayor, stats: { budget: 90, opinion: 90, infrastructure: 90, education: 90, securite: 90 } })
     expect(good.finalScore).toBeGreaterThan(poor.finalScore)
   })
+
+  it('chaque ville est trouvable par son id dans CITIES', () => {
+    for (const city of CITIES) {
+      const found = CITIES.find(c => c.id === city.id)
+      expect(found).toBeDefined()
+      expect(found!.name).toBe(city.name)
+      expect(found!.size).toBe(city.size)
+    }
+  })
 })
 
 describe('★ Décroissance annuelle', () => {
