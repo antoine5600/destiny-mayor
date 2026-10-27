@@ -5,9 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import type { GameContext, CareerResult, Stats, Background, BackgroundQuestion } from '@/types/game'
 import { CITIES, BACKGROUND_QUESTIONS, getBackgroundStats } from '@/lib/game-engine/data'
 import { LockInput } from '@/components/ui/lock-input'
-import { MagneticButton } from '@/components/ui/magnetic-button'
 import { NeonEdgeButton } from '@/components/ui/neon-edge-button'
-import { StatCard, StatGrid } from '@/components/ui/stat-card'
 
 type ActionType =
   | { type: 'start-mandate'; cityId: string }
@@ -20,6 +18,11 @@ type ActionType =
   | { type: 'get-accessible-cities' }
 
 type CreationStep = 'name' | 'origins' | 'studies' | 'work' | 'preview'
+
+/** Style partagé pour les boutons principaux (orange/doré) */
+const BTN_PRIMARY = 'w-full py-3 rounded-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed hover:from-yellow-300 hover:to-orange-400 transition-all'
+/** Style pour les boutons secondaires (transparents avec bordure) */
+const BTN_SECONDARY = 'w-full py-3 rounded-lg font-semibold border-2 border-slate-600 bg-slate-800 hover:border-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all'
 
 export default function Home() {
   const { data: session } = useSession()
@@ -159,7 +162,6 @@ export default function Home() {
             <p className="text-slate-400">Écrivez votre légende politique</p>
           </div>
 
-          {/* Barre de progression */}
           <div className="flex gap-2 justify-center">
             {(['name', 'origins', 'studies', 'work', 'preview'] as CreationStep[]).map((s, i) => {
               const stepNames = ['Nom', 'Origines', 'Études', 'Métier', 'Récap']
@@ -171,7 +173,6 @@ export default function Home() {
             })}
           </div>
 
-          {/* Étape : Nom */}
           {step === 'name' && (
             <div className="space-y-6">
               <div className="text-center">
@@ -187,19 +188,16 @@ export default function Home() {
                 description="Donnez un nom à votre futur maire"
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && name.trim()) setStep('origins') }}
               />
-              <MagneticButton
+              <button
                 onClick={() => setStep('origins')}
                 disabled={!name.trim()}
-                variant="primary"
-                size="lg"
-                className="w-full"
+                className={BTN_PRIMARY}
               >
                 Suivant →
-              </MagneticButton>
+              </button>
             </div>
           )}
 
-          {/* Étapes : questions (origins, studies, work) */}
           {(['origins', 'studies', 'work'] as string[]).includes(step) && (
             <BackgroundQuestionStep
               question={BACKGROUND_QUESTIONS.find(q => q.id === step)!}
@@ -208,7 +206,6 @@ export default function Home() {
             />
           )}
 
-          {/* Étape : Récapitulatif */}
           {step === 'preview' && (
             <div className="space-y-6">
               <div className="text-center">
@@ -243,14 +240,12 @@ export default function Home() {
                 {loading ? '⏳ Création...' : '★ Commencer ma carrière ★'}
               </NeonEdgeButton>
 
-              <MagneticButton
+              <button
                 onClick={() => setStep('work')}
-                variant="ghost"
-                size="sm"
-                className="w-full text-slate-400"
+                className="w-full py-2 text-sm text-slate-400 hover:text-white transition-all"
               >
                 ← Modifier mes réponses
-              </MagneticButton>
+              </button>
             </div>
           )}
         </div>
@@ -274,7 +269,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); }}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold"
+            className={BTN_PRIMARY}
           >
             ★ Nouvelle partie ★
           </button>
@@ -310,30 +305,26 @@ export default function Home() {
           )}
           <div className="space-y-3">
             {ev.choices.map((choice, i) => (
-              <MagneticButton
+              <button
                 key={i}
                 onClick={() => apiCall({ type: 'resolve-event', choiceIndex: i })}
                 disabled={loading}
-                variant="outline"
-                size="md"
-                className="w-full text-left"
+                className="w-full p-4 rounded-lg border-2 border-slate-600 bg-slate-800 hover:border-yellow-400 text-left transition-all disabled:opacity-50"
               >
-                <div className="w-full">
-                  <p className="font-semibold">{choice.label}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {effectToTags(choice.effects).map((tag, j) => (
-                      <span key={j} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-                        tag.direction === 'up' ? 'bg-green-900/50 text-green-400' :
-                        tag.direction === 'down' ? 'bg-red-900/50 text-red-400' :
-                        'bg-slate-700 text-slate-400'
-                      }`}>
-                        {tag.icon}{tag.label}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-slate-400 mt-2">{choice.description}</p>
+                <p className="font-semibold">{choice.label}</p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {effectToTags(choice.effects).map((tag, j) => (
+                    <span key={j} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                      tag.direction === 'up' ? 'bg-green-900/50 text-green-400' :
+                      tag.direction === 'down' ? 'bg-red-900/50 text-red-400' :
+                      'bg-slate-700 text-slate-400'
+                    }`}>
+                      {tag.icon}{tag.label}
+                    </span>
+                  ))}
                 </div>
-              </MagneticButton>
+                <p className="text-sm text-slate-400 mt-2">{choice.description}</p>
+              </button>
             ))}
           </div>
           {error && <p className="text-red-400 text-sm text-center">{error}</p>}
@@ -373,7 +364,7 @@ export default function Home() {
           </div>
           <button
             onClick={() => { setGameCtx(null); setCareerResult(null); setEventResult(null); setAccessibleCities([]) }}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-slate-900 font-bold hover:from-yellow-300 hover:to-orange-400 transition-all"
+            className={BTN_PRIMARY}
           >
             ★ Nouvelle partie ★
           </button>
@@ -398,33 +389,27 @@ export default function Home() {
             </div>
           )}
           <div className="space-y-3">
-            <MagneticButton
+            <button
               onClick={() => apiCall({ type: 'stay-in-city' })}
               disabled={loading}
-              variant="primary"
-              size="md"
-              className="w-full"
+              className={BTN_PRIMARY}
             >
               Rester à {gameCtx.currentCity?.name} 🔄
-            </MagneticButton>
-            <MagneticButton
+            </button>
+            <button
               onClick={() => apiCall({ type: 'get-accessible-cities' })}
               disabled={loading}
-              variant="secondary"
-              size="md"
-              className="w-full"
+              className={BTN_SECONDARY}
             >
               Changer de ville 🏙️
-            </MagneticButton>
-            <MagneticButton
+            </button>
+            <button
               onClick={() => apiCall({ type: 'retire' })}
               disabled={loading}
-              variant="secondary"
-              size="md"
-              className="w-full"
+              className={BTN_SECONDARY}
             >
               Prendre sa retraite 🏁
-            </MagneticButton>
+            </button>
           </div>
           {accessibleCities.length > 0 && (
             <div className="space-y-2">
@@ -484,24 +469,19 @@ export default function Home() {
           </div>
         )}
 
-        <StatGrid>
-          {Object.entries(gameCtx.mayor?.stats ?? {}).map(([key, value]) => {
-            const colors: Record<string, string> = { budget: '#f59e0b', opinion: '#3b82f6', infrastructure: '#10b981', education: '#8b5cf6', securite: '#ef4444' }
-            return (
-              <StatCard
-                key={key}
-                label={statLabel(key)}
-                value={value}
-                previous={50}
-                trend={[value]}
-                color={colors[key] || '#f59e0b'}
-                format={(n: number) => `${statEmoji(key)} ${n}`}
-                animated={true}
-                period=""
-              />
-            )
-          })}
-        </StatGrid>
+        {/* Stats compactes — 5 colonnes, sans effet magnétique */}
+        <div className="grid grid-cols-5 gap-2">
+          {Object.entries(gameCtx.mayor?.stats ?? {}).map(([key, value]) => (
+            <div key={key} className="bg-slate-800 rounded-lg p-3 text-center">
+              <div className="text-xl mb-1">{statEmoji(key)}</div>
+              <div className="w-full bg-slate-700 rounded-full h-1.5 mb-1">
+                <div className="h-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all" style={{ width: `${Math.min(100, value)}%` }} />
+              </div>
+              <div className="text-[10px] text-slate-400 capitalize mb-0.5">{statLabel(key)}</div>
+              <div className="text-lg font-bold">{value}</div>
+            </div>
+          ))}
+        </div>
 
         <p className="text-sm text-slate-400 text-center italic">
           {gameCtx.currentCity?.description}
@@ -509,15 +489,13 @@ export default function Home() {
 
         <div className="space-y-3">
           {gameCtx.phase === 'carriere' && (
-            <MagneticButton
+            <button
               onClick={() => { setEventResult(null); apiCall({ type: 'advance-year' }) }}
               disabled={loading}
-              variant="primary"
-              size="lg"
-              className="w-full text-lg font-bold"
+              className={BTN_PRIMARY + ' text-lg'}
             >
               {loading ? '⏳ Année en cours...' : "📅 Avancer d'un an"}
-            </MagneticButton>
+            </button>
           )}
         </div>
 
@@ -545,12 +523,14 @@ function BackgroundQuestionStep({
       </div>
       <div className="space-y-3">
         {question.choices.map(choice => (
-          <MagneticButton
+          <button
             key={choice.id}
             onClick={() => onSelect(choice.id)}
-            variant={selected === choice.id ? 'primary' : 'outline'}
-            size="md"
-            className="w-full text-left"
+            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+              selected === choice.id
+                ? 'border-yellow-400 bg-slate-700'
+                : 'border-slate-600 bg-slate-800 hover:border-slate-500'
+            }`}
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">{choice.icon}</span>
@@ -569,7 +549,7 @@ function BackgroundQuestionStep({
                 </div>
               </div>
             </div>
-          </MagneticButton>
+          </button>
         ))}
       </div>
     </div>
@@ -586,11 +566,11 @@ function BackgroundPreviewStats({ bg }: { bg: Background }) {
         {Object.entries(stats).map(([key, value]) => (
           <div key={key} className="text-center">
             <div className="text-lg">{statEmoji(key)}</div>
-            <div className="text-[10px] text-slate-400">{statLabel(key)}</div>
             <div className="w-full bg-slate-700 rounded-full h-1 mt-1">
               <div className="h-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500" style={{ width: `${value}%` }} />
             </div>
-            <div className="text-xs font-bold mt-1">{value}</div>
+            <div className="text-[10px] text-slate-400">{statLabel(key)}</div>
+            <div className="text-xs font-bold mt-0.5">{value}</div>
           </div>
         ))}
       </div>
