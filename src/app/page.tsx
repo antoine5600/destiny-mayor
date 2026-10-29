@@ -138,8 +138,8 @@ export default function Home() {
   // ===== Écran de création =====
   if (!gameCtx) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center justify-center p-4">
-        <div className="max-w-lg w-full space-y-8">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-lg lg:max-w-xl mx-auto space-y-8">
           {/* Auth header */}
           <div className="flex justify-end gap-2">
             {session?.user ? (
@@ -256,8 +256,8 @@ export default function Home() {
   // ===== Destitution =====
   if (careerResult && careerResult.destituted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6 text-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="w-full max-w-lg lg:max-w-xl mx-auto space-y-6 text-center">
           <span className="text-7xl">💀</span>
           <h2 className="text-3xl font-bold text-red-500">Destitué !</h2>
           <p className="text-xl text-slate-300">Maire {careerResult.mayor.name}</p>
@@ -283,15 +283,15 @@ export default function Home() {
     const ev = gameCtx.currentEvent
     const currentStats = gameCtx.mayor?.stats
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4">
-        <div className="max-w-lg mx-auto space-y-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-lg lg:max-w-2xl mx-auto space-y-6">
           <div className="text-center">
             <span className="text-6xl">⚡</span>
             <h2 className="text-2xl font-bold mt-2">{ev.title}</h2>
             <p className="text-slate-400 mt-2">{ev.description}</p>
           </div>
           {currentStats && (
-            <div className="grid grid-cols-5 gap-1.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
               {Object.entries(currentStats).map(([key, value]) => (
                 <div key={key} className={`bg-slate-800 rounded-lg p-2 text-center ${value <= 0 ? 'ring-2 ring-red-500 animate-pulse' : ''}`}>
                   <div className="text-lg">{statEmoji(key)}</div>
@@ -337,12 +337,12 @@ export default function Home() {
   if (careerResult) {
     const gradeColors: Record<string, string> = { S: 'text-yellow-400', A: 'text-green-400', B: 'text-blue-400', C: 'text-purple-400', D: 'text-orange-400', E: 'text-red-400' }
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6 text-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="w-full max-w-lg lg:max-w-xl mx-auto space-y-6 text-center">
           <span className="text-6xl">🏛️</span>
           <h2 className="text-3xl font-bold">Carrière terminée</h2>
           <p className="text-xl">Maire {careerResult.mayor.name}</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-slate-800 p-4 rounded-lg">
               <p className="text-2xl font-bold text-yellow-400">{careerResult.totalYears}</p>
               <p className="text-xs text-slate-400">Années</p>
@@ -376,8 +376,8 @@ export default function Home() {
   // ===== Phase : Fin de mandat =====
   if (gameCtx.phase === 'fin-mandat') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 flex items-center justify-center">
-        <div className="max-w-lg w-full space-y-6 text-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="w-full max-w-lg lg:max-w-xl mx-auto space-y-6 text-center">
           <span className="text-6xl">📅</span>
           <h2 className="text-2xl font-bold">Fin du mandat</h2>
           <p className="text-slate-400">
@@ -441,9 +441,9 @@ export default function Home() {
 
   // ===== Dashboard mandat =====
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 sm:p-6 lg:p-8 xl:p-10">
+      <div className="w-full max-w-4xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div className="flex gap-2">
             <button onClick={saveGame} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all">💾 Sauvegarder</button>
             <button onClick={loadGame} className="text-xs bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20 transition-all">📂 Charger</button>
@@ -470,7 +470,7 @@ export default function Home() {
         )}
 
         {/* Stats compactes — 5 colonnes, sans effet magnétique */}
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
           {Object.entries(gameCtx.mayor?.stats ?? {}).map(([key, value]) => (
             <div key={key} className="bg-slate-800 rounded-lg p-3 text-center">
               <div className="text-xl mb-1">{statEmoji(key)}</div>
@@ -562,7 +562,7 @@ function BackgroundPreviewStats({ bg }: { bg: Background }) {
   return (
     <div className="bg-slate-800 rounded-lg p-4">
       <p className="text-sm font-medium text-slate-300 text-center mb-2">Stats de départ</p>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         {Object.entries(stats).map(([key, value]) => (
           <div key={key} className="text-center">
             <div className="text-lg">{statEmoji(key)}</div>
